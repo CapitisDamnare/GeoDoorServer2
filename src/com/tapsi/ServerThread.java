@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  * @author a.tappler
  */
 public class ServerThread implements Runnable {
-    
+
     private final ServerSocket serverSocket;
     private Socket socket;
     private final ExecutorService pool;
@@ -29,9 +29,9 @@ public class ServerThread implements Runnable {
     private ConnectionClientThreads client;
     private HashMap<Integer,ConnectionClientThreads> clientMap;
     private int threadIter;
-    
+
     private boolean close = true;
-    
+
     public ServerThread() throws IOException {
         threadIter = 0;
         clientMap = new HashMap<>();
@@ -77,12 +77,12 @@ public class ServerThread implements Runnable {
             Thread.currentThread().interrupt();
         }
     }
-    
+
     public void test() {
         System.err.println("Shut down client");
         client.closeThread();
     }
-    
+
     public void quit() {
         close = false;
         try {
@@ -92,7 +92,7 @@ public class ServerThread implements Runnable {
             LogHandler.handleError(ex);
         }
     }
-    
+
     public void closeClientThreads () {
         for (Map.Entry<Integer,ConnectionClientThreads> entry : clientMap.entrySet() ) {
             ConnectionClientThreads mapClient = entry.getValue();

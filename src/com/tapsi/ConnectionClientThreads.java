@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ *
  * @author a.tappler
  */
 public class ConnectionClientThreads implements Runnable {
@@ -46,6 +47,14 @@ public class ConnectionClientThreads implements Runnable {
                 if (line.compareTo("stop") == 0) {
                     //System.err.println("what");
                     sendMessage("warum?");
+                }
+                if (line.contains("cmnd:")) {
+                    if (line.compareTo("cmnd:Andreas") == 0) {
+                        sendMessage("cmnd-name:true");
+                    }
+                    else
+                        sendMessage("cmnd-name:false");
+
                 }
             }
         } catch (IOException ex) {
