@@ -11,10 +11,6 @@ import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author a.tappler
- */
 public class GeoDoorServer2 {
     
     private static InterfaceToVisu inVisu = null;
