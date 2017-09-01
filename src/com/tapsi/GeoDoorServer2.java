@@ -3,8 +3,6 @@ package com.tapsi;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 public class GeoDoorServer2 {
@@ -14,9 +12,7 @@ public class GeoDoorServer2 {
     private static ServerThread serverThread = null;
     private static Thread tServerThread = null;
 
-    /**
-     * @param args the command line arguments
-     */
+
     public static void main(String[] args) throws IOException {
         GeoDoorServer2 server = new GeoDoorServer2();
         inVisu = new InterfaceToVisu(server);
