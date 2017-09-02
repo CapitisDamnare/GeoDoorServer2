@@ -1,15 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.tapsi;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class GeoDoorServer2 {
     
@@ -18,14 +11,12 @@ public class GeoDoorServer2 {
     private static ServerThread serverThread= null;
     private static Thread tServerThread = null;
 
-    /** 
-     * @param args the command line arguments
-     */
     public static void main(String[] args) throws IOException {
+        // Create instance of the server
         GeoDoorServer2 server = new GeoDoorServer2();
         inVisu = new InterfaceToVisu(server);
         
-        // Console
+        // Console Prompt
         while (!quit) {
             BufferedReader bufreader = new BufferedReader(new InputStreamReader(System.in));
             LogHandler.printPrompt();
@@ -37,7 +28,8 @@ public class GeoDoorServer2 {
             }          
         }
     }
-    
+
+    // Console Commands
     private static void checkCommand(String command) throws GeoDoorExceptions{
         switch (command) {
             case "quit":
@@ -84,10 +76,10 @@ public class GeoDoorServer2 {
         try {
             inVisu.closeVisualisation();
             stopServer();
-            quit = val;
         } catch (GeoDoorExceptions ex) {
             LogHandler.handleError(ex);
         }
+        quit = val;
     }
     
     private static void showHideVisu(boolean val) {
