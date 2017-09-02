@@ -38,4 +38,6 @@ public class MessageHandlerThread implements Runnable {
             }
         }
     }
+
+    // Todo: Add command handling for different commands
 }
