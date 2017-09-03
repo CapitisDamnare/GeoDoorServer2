@@ -12,6 +12,7 @@ public class MessageHandlerThread implements Runnable {
         queue = new ArrayBlockingQueue<String>(1024);
     }
 
+    // put a message from client Thread in the queue (That's thread safe!)
     public void putMessage (String msg) {
         try {
             queue.put(msg);
@@ -20,6 +21,7 @@ public class MessageHandlerThread implements Runnable {
         }
     }
 
+    // Check permanently the queue for new messages to handle
     @Override
     public void run() {
         System.err.println("MessagHandlerThread started ...");
@@ -37,6 +39,11 @@ public class MessageHandlerThread implements Runnable {
                 LogHandler.handleError(e);
             }
         }
+    }
+
+    // Close the thread
+    public void quit() {
+        close = false;
     }
 
     // Todo: Add command handling for different commands

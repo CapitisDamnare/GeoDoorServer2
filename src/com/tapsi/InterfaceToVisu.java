@@ -4,7 +4,7 @@ import java.io.IOException;
 
 public class InterfaceToVisu {
     //private static Visualization visu = null;
-    private static GeoDoorServer2 server= null;
+    GeoDoorServer2 server = null;
     
     public InterfaceToVisu(GeoDoorServer2 server) {
         this.server = server;

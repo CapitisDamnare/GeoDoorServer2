@@ -3,7 +3,7 @@ package com.tapsi;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
+import java.net.SocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -12,39 +12,58 @@ import java.util.concurrent.TimeUnit;
 
 public class ServerThread implements Runnable {
 
+    // Message Handler for incoming messages
+    private MessageHandlerThread msgHandler = null;
+    private Thread tHandlerThread = null;
+
+    // Database Handler to save Names and allowed usage of the KNX Handler
+    DBHandler dbHandler = null;
+
+    // KNXHandler to connect to the OpenHAB API
+    // Todo: Create KNXHandler
+
+    // Client ExecutorService for the client threads
+    private final ExecutorService pool;
+    private ConnectionClientThreads client;
+
+    // Socket for the Server
     private final ServerSocket serverSocket;
     private Socket socket;
-    private final ExecutorService pool;
-    private MessageHandlerThread msgHandler = null;
-    private static Thread tHandlerThread = null;
-    private ConnectionClientThreads client;
-    private ConcurrentHashMap<Integer,ConnectionClientThreads> clientMap;
-    private int threadIter;
 
+    // Thread Safe HashMap to safe and get access to the Client Threads
+    private ConcurrentHashMap<String,ConnectionClientThreads> clientMap;
+
+    // boolean to close the Thread
     private boolean close = true;
 
     public ServerThread() throws IOException {
-        threadIter = 0;
+        // Create and start MessageHandler
         msgHandler = new MessageHandlerThread();
         tHandlerThread = new Thread(msgHandler);
         tHandlerThread.start();
+
+        // Create or open DB
+        dbHandler = new DBHandler();
+
         clientMap = new ConcurrentHashMap<>();
+
+        // Start the Server
         serverSocket = new ServerSocket(1234);
         pool = Executors.newFixedThreadPool(10);
         System.out.println("Server started...");
     }
 
+    // If a new client connects to the socket a new Thread will be started for the connection
     @Override
     public void run() {
         while(close) {
             try {
-                // If a new socket connection comes a ClienThread will be created
                 socket = serverSocket.accept();
-                client = new ConnectionClientThreads(socket, threadIter);
+                client = new ConnectionClientThreads(socket, socket.getRemoteSocketAddress().toString());
                 pool.execute(client);
-                clientMap.put(threadIter, client);
+                clientMap.put(socket.getRemoteSocketAddress().toString(), client);
                 initClientListener(client);
-                threadIter++;
+
                 System.err.println("Size: " + clientMap.size());
             } catch (IOException ex) {
                 LogHandler.handleError(ex);
@@ -54,10 +73,11 @@ public class ServerThread implements Runnable {
         shutdownAndAwaitTermination(pool);
     }
 
+    // Client listener for every thread from the connected clients
     public void initClientListener (ConnectionClientThreads client) {
         client.setCustomListener(new ConnectionClientThreads.ClientListener() {
             @Override
-            public void onClientClosed(int id) {
+            public void onClientClosed(String id) {
                 deleteClient(id);
             }
 
@@ -70,6 +90,7 @@ public class ServerThread implements Runnable {
 
     // Todo: Implement method to send a message to a specific thread or connected device
 
+    // This wil shutdown all Threads for sure if they are finished with their tasks
     void shutdownAndAwaitTermination(ExecutorService pool) {
         pool.shutdown(); // Disable new tasks from being submitted
         try {
@@ -89,33 +110,44 @@ public class ServerThread implements Runnable {
         }
     }
 
+    // Just a small test method.
+    // Todo: Delete if not necessary anymore
     public void test() {
-        System.err.println("Shut down client");
-        client.closeThread();
+        dbHandler.insertClient("Andreas",1, 0);
     }
 
+    // Close all clientThreads, Server Thread and MessageHandler Thread
     public void quit() {
         close = false;
         try {
             serverSocket.close();
             closeClientThreads();
+            msgHandler.quit();
+            dbHandler.closeDB();
         } catch (IOException ex) {
             LogHandler.handleError(ex);
         }
     }
 
+    // Close all client Threads registered in the map
     public void closeClientThreads () {
-        for (Map.Entry<Integer,ConnectionClientThreads> entry : clientMap.entrySet() ) {
+        for (Map.Entry<String,ConnectionClientThreads> entry : clientMap.entrySet() ) {
             ConnectionClientThreads mapClient = entry.getValue();
             mapClient.closeThread();
         }
     }
 
-    public void  deleteClient (int threadId) {
+    // Delete a specific client Thread in the map
+    public void  deleteClient (String threadId) {
         if(clientMap.containsKey(threadId)) {
             clientMap.remove(threadId);
         }
-        threadIter--;
         System.err.println("Size: " + clientMap.size());
+    }
+
+    // send a message to e specific client
+    public void sendMessagetoDevice (String sAddresse, String msg) {
+        ConnectionClientThreads currentUser = clientMap.get(sAddresse);
+        currentUser.sendMessage(msg);
     }
 }

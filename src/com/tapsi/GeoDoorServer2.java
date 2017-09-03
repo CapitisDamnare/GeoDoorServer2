@@ -7,25 +7,27 @@ import java.io.InputStreamReader;
 public class GeoDoorServer2 {
     
     private static InterfaceToVisu inVisu = null;
-    private static boolean quit = false;
     private static ServerThread serverThread= null;
     private static Thread tServerThread = null;
+    private static boolean quit = false;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         // Create instance of the server
         GeoDoorServer2 server = new GeoDoorServer2();
         inVisu = new InterfaceToVisu(server);
         
         // Console Prompt
         while (!quit) {
-            BufferedReader bufreader = new BufferedReader(new InputStreamReader(System.in));
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
             LogHandler.printPrompt();
-            String command = bufreader.readLine();
             try {
+                String command = bufferedReader.readLine();
                 checkCommand(command);
             } catch (GeoDoorExceptions ex) {
                 LogHandler.handleError(ex);
-            }          
+            } catch (IOException e) {
+                LogHandler.handleError(e);
+            }
         }
     }
 

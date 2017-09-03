@@ -8,7 +8,7 @@ import java.net.Socket;
 
 public class ConnectionClientThreads implements Runnable {
 
-    private int clientID = 0;
+    private String clientID = null;
     private Socket socket = null;
 
     private String line = "";
@@ -19,12 +19,13 @@ public class ConnectionClientThreads implements Runnable {
     private ClientListener listener;
 
     public interface ClientListener {
-        public void onClientClosed(int id);
+        public void onClientClosed(String id);
         // Todo: Send id from connection to ensure only connection with the same name
         public void onMessage (String msg);
     }
 
-    public ConnectionClientThreads(Socket socket, int clientID) {
+    // Implement Listener to send messages to the server thread
+    public ConnectionClientThreads(Socket socket, String clientID) {
         this.socket = socket;
         this.clientID = clientID;
         this.listener = null;
@@ -34,10 +35,11 @@ public class ConnectionClientThreads implements Runnable {
         this.listener = listener;
     }
 
+    // Create a new input and output stream and wait for incoming messages
     @Override
     public void run() {
         System.err.println("");
-        System.err.println("ClientThread " + clientID + " started ...");
+        System.err.println("ClientThread " + socket.getRemoteSocketAddress().toString() + " started ...");
 
         try {
             inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -51,6 +53,8 @@ public class ConnectionClientThreads implements Runnable {
                 line = inputStream.readLine();
                 System.err.println(clientID + " -> " + line);
                 listener.onMessage(line);
+
+                // Move this to the MessageHandler
                 if (line.compareTo("stop") == 0) {
 
                     sendMessage("warum?");

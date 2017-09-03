@@ -1,6 +1,7 @@
 package com.tapsi;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class LogHandler {
 
@@ -8,11 +9,23 @@ public class LogHandler {
         ex.printStackTrace();
     }
 
-    static void handleError(InterruptedException ex) {
+    public static void handleError(InterruptedException ex) {
         ex.printStackTrace();
     }
 
-    static void handleError(IOException ex) {
+    public static void handleError(IOException ex) {
+        ex.printStackTrace();
+    }
+
+    public static void handleError(ClassNotFoundException ex) {
+        ex.printStackTrace();
+    }
+
+    public static void handleError(SQLException ex) {
+        ex.printStackTrace();
+    }
+
+    public static void handleError(Exception ex) {
         ex.printStackTrace();
     }
 
