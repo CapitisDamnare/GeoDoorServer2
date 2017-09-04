@@ -5,15 +5,15 @@ import java.util.concurrent.BlockingQueue;
 
 public class MessageHandlerThread implements Runnable {
 
-    BlockingQueue<String> queue;
+    private BlockingQueue<String> queue;
     private boolean close = true;
 
-    public MessageHandlerThread() {
+    MessageHandlerThread() {
         queue = new ArrayBlockingQueue<String>(1024);
     }
 
     // put a message from client Thread in the queue (That's thread safe!)
-    public void putMessage (String msg) {
+    void putMessage(String msg) {
         try {
             queue.put(msg);
         } catch (InterruptedException e) {
@@ -28,7 +28,13 @@ public class MessageHandlerThread implements Runnable {
         while (close) {
             if(queue.size() > 0) {
                 try {
-                    System.err.println("Size: " + queue.size() + " Took message: " + queue.take());
+                    String msg = queue.take();
+                    System.err.println("Size: " + queue.size() + " Took message: " + msg);
+                    if (msg.contains("cmnd:")) {
+                        msg.replace("cmnd:","");
+                        String command = msg.substring(0,msg.indexOf())
+                    }
+
                 } catch (InterruptedException e) {
                     LogHandler.handleError(e);
                 }
@@ -42,7 +48,7 @@ public class MessageHandlerThread implements Runnable {
     }
 
     // Close the thread
-    public void quit() {
+    void quit() {
         close = false;
     }
 

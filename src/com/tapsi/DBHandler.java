@@ -10,7 +10,7 @@ public class DBHandler {
     private Connection c = null;
     private Statement stmt = null;
 
-    public DBHandler() {
+    DBHandler() {
 
         // Connect to database or create if no existent
         try {

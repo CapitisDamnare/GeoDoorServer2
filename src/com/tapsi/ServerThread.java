@@ -3,7 +3,6 @@ package com.tapsi;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -14,21 +13,18 @@ public class ServerThread implements Runnable {
 
     // Message Handler for incoming messages
     private MessageHandlerThread msgHandler = null;
-    private Thread tHandlerThread = null;
 
     // Database Handler to save Names and allowed usage of the KNX Handler
-    DBHandler dbHandler = null;
+    private DBHandler dbHandler = null;
 
     // KNXHandler to connect to the OpenHAB API
     // Todo: Create KNXHandler
 
     // Client ExecutorService for the client threads
     private final ExecutorService pool;
-    private ConnectionClientThreads client;
 
     // Socket for the Server
     private final ServerSocket serverSocket;
-    private Socket socket;
 
     // Thread Safe HashMap to safe and get access to the Client Threads
     private ConcurrentHashMap<String,ConnectionClientThreads> clientMap;
@@ -36,10 +32,10 @@ public class ServerThread implements Runnable {
     // boolean to close the Thread
     private boolean close = true;
 
-    public ServerThread() throws IOException {
+    ServerThread() throws IOException {
         // Create and start MessageHandler
         msgHandler = new MessageHandlerThread();
-        tHandlerThread = new Thread(msgHandler);
+        Thread tHandlerThread = new Thread(msgHandler);
         tHandlerThread.start();
 
         // Create or open DB
@@ -58,8 +54,8 @@ public class ServerThread implements Runnable {
     public void run() {
         while(close) {
             try {
-                socket = serverSocket.accept();
-                client = new ConnectionClientThreads(socket, socket.getRemoteSocketAddress().toString());
+                Socket socket = serverSocket.accept();
+                ConnectionClientThreads client = new ConnectionClientThreads(socket, socket.getRemoteSocketAddress().toString());
                 pool.execute(client);
                 clientMap.put(socket.getRemoteSocketAddress().toString(), client);
                 initClientListener(client);
@@ -74,7 +70,7 @@ public class ServerThread implements Runnable {
     }
 
     // Client listener for every thread from the connected clients
-    public void initClientListener (ConnectionClientThreads client) {
+    private void initClientListener(ConnectionClientThreads client) {
         client.setCustomListener(new ConnectionClientThreads.ClientListener() {
             @Override
             public void onClientClosed(String id) {
@@ -91,7 +87,7 @@ public class ServerThread implements Runnable {
     // Todo: Implement method to send a message to a specific thread or connected device
 
     // This wil shutdown all Threads for sure if they are finished with their tasks
-    void shutdownAndAwaitTermination(ExecutorService pool) {
+    private void shutdownAndAwaitTermination(ExecutorService pool) {
         pool.shutdown(); // Disable new tasks from being submitted
         try {
             if (!pool.awaitTermination(10, TimeUnit.SECONDS)) {
@@ -112,12 +108,12 @@ public class ServerThread implements Runnable {
 
     // Just a small test method.
     // Todo: Delete if not necessary anymore
-    public void test() {
+    void test() {
         dbHandler.insertClient("Andreas",1, 0);
     }
 
     // Close all clientThreads, Server Thread and MessageHandler Thread
-    public void quit() {
+    void quit() {
         close = false;
         try {
             serverSocket.close();
@@ -130,7 +126,7 @@ public class ServerThread implements Runnable {
     }
 
     // Close all client Threads registered in the map
-    public void closeClientThreads () {
+    private void closeClientThreads() {
         for (Map.Entry<String,ConnectionClientThreads> entry : clientMap.entrySet() ) {
             ConnectionClientThreads mapClient = entry.getValue();
             mapClient.closeThread();
@@ -138,7 +134,7 @@ public class ServerThread implements Runnable {
     }
 
     // Delete a specific client Thread in the map
-    public void  deleteClient (String threadId) {
+    private void  deleteClient(String threadId) {
         if(clientMap.containsKey(threadId)) {
             clientMap.remove(threadId);
         }

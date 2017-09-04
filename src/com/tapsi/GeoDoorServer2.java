@@ -8,13 +8,11 @@ public class GeoDoorServer2 {
     
     private static InterfaceToVisu inVisu = null;
     private static ServerThread serverThread= null;
-    private static Thread tServerThread = null;
     private static boolean quit = false;
 
     public static void main(String[] args) {
         // Create instance of the server
-        GeoDoorServer2 server = new GeoDoorServer2();
-        inVisu = new InterfaceToVisu(server);
+        inVisu = new InterfaceToVisu();
         
         // Console Prompt
         while (!quit) {
@@ -61,13 +59,13 @@ public class GeoDoorServer2 {
         }
     }
 
-    public static void startServer() throws InterruptedException, IOException {
+    static void startServer() throws InterruptedException, IOException {
         serverThread = new ServerThread();
-        tServerThread = new Thread(serverThread);
+        Thread tServerThread = new Thread(serverThread);
         tServerThread.start();
     }
     
-    public static void stopServer() throws GeoDoorExceptions {
+    static void stopServer() throws GeoDoorExceptions {
         if (serverThread != null)
             serverThread.quit();
         else

@@ -11,31 +11,30 @@ public class ConnectionClientThreads implements Runnable {
     private String clientID = null;
     private Socket socket = null;
 
-    private String line = "";
-
     private BufferedReader inputStream = null;
     private PrintWriter outputStream = null;
 
     private ClientListener listener;
 
     public interface ClientListener {
-        public void onClientClosed(String id);
+        void onClientClosed(String id);
         // Todo: Send id from connection to ensure only connection with the same name
-        public void onMessage (String msg);
+        void onMessage (String msg);
     }
 
     // Implement Listener to send messages to the server thread
-    public ConnectionClientThreads(Socket socket, String clientID) {
+    ConnectionClientThreads(Socket socket, String clientID) {
         this.socket = socket;
         this.clientID = clientID;
         this.listener = null;
     }
 
-    public void setCustomListener(ClientListener listener) {
+    void setCustomListener(ClientListener listener) {
         this.listener = listener;
     }
 
     // Create a new input and output stream and wait for incoming messages
+    @SuppressWarnings("InfiniteLoopStatement")
     @Override
     public void run() {
         System.err.println("");
@@ -50,7 +49,7 @@ public class ConnectionClientThreads implements Runnable {
 
         try {
             while (true) {
-                line = inputStream.readLine();
+                String line = inputStream.readLine();
                 System.err.println(clientID + " -> " + line);
                 listener.onMessage(line);
 
@@ -85,10 +84,9 @@ public class ConnectionClientThreads implements Runnable {
                 LogHandler.handleError(ex);
             }
         }
-
     }
 
-    public void closeThread() {
+    void closeThread() {
         try {
             sendMessage("quit");
             socket.close();
@@ -110,7 +108,7 @@ public class ConnectionClientThreads implements Runnable {
         }
     }
 
-    public void sendMessage(String text) {
+    void sendMessage(String text) {
         outputStream.println(text);
         outputStream.flush();
     }
