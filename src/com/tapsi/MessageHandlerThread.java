@@ -32,7 +32,7 @@ public class MessageHandlerThread implements Runnable {
                     System.err.println("Size: " + queue.size() + " Took message: " + msg);
                     if (msg.contains("cmnd:")) {
                         msg.replace("cmnd:","");
-                        String command = msg.substring(0,msg.indexOf())
+                        //String command = msg.substring(0,msg.indexOf());
                     }
 
                 } catch (InterruptedException e) {
