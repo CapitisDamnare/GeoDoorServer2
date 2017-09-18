@@ -30,9 +30,15 @@ public class MessageHandlerThread implements Runnable {
                 try {
                     String msg = queue.take();
                     System.err.println("Size: " + queue.size() + " Took message: " + msg);
-                    if (msg.contains("cmnd:")) {
-                        msg.replace("cmnd:","");
-                        //String command = msg.substring(0,msg.indexOf());
+                    if (msg.contains(":")) {
+                        //msg.replace("cmnd:","");
+                        String command = msg.substring(0,msg.indexOf(":"));
+
+                        switch (command) {
+                            case "register":
+                                System.err.println(command);
+                                break;
+                        }
                     }
 
                 } catch (InterruptedException e) {

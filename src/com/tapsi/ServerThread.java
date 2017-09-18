@@ -60,7 +60,6 @@ public class ServerThread implements Runnable {
                 clientMap.put(socket.getRemoteSocketAddress().toString(), client);
                 initClientListener(client);
 
-                System.err.println("Size: " + clientMap.size());
             } catch (IOException ex) {
                 LogHandler.handleError(ex);
             }
