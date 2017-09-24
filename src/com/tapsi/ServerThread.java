@@ -37,15 +37,15 @@ public class ServerThread implements Runnable {
     private boolean close = true;
 
     public ServerThread() throws IOException {
-        // Create and start MessageHandler
-        msgHandler = new MessageHandlerThread();
-        tHandlerThread = new Thread(msgHandler);
-        tHandlerThread.start();
-
         // Create or open DB
         dbHandler = new DBHandler();
 
         clientMap = new ConcurrentHashMap<>();
+
+        // Create and start MessageHandler
+        msgHandler = new MessageHandlerThread(dbHandler);
+        tHandlerThread = new Thread(msgHandler);
+        tHandlerThread.start();
 
         // Start the Server
         serverSocket = new ServerSocket(1234);
@@ -64,7 +64,7 @@ public class ServerThread implements Runnable {
                 clientMap.put(socket.getRemoteSocketAddress().toString(), client);
                 initClientListener(client);
 
-                System.err.println("Size: " + clientMap.size());
+                System.err.println("Thread Map Size: " + clientMap.size());
             } catch (IOException ex) {
                 LogHandler.handleError(ex);
             }
@@ -82,8 +82,8 @@ public class ServerThread implements Runnable {
             }
 
             @Override
-            public void onMessage(String msg) {
-                msgHandler.putMessage(msg);
+            public void onMessage(String clientID, String msg) {
+                msgHandler.putMessage(clientID + "#" + msg);
             }
         });
     }
@@ -113,7 +113,7 @@ public class ServerThread implements Runnable {
     // Just a small test method.
     // Todo: Delete if not necessary anymore
     public void test() {
-        dbHandler.insertClient("Andreas",1, 0);
+        dbHandler.insertClient("Andreas2","89014103211118510720", "0");
     }
 
     // Close all clientThreads, Server Thread and MessageHandler Thread
@@ -142,7 +142,6 @@ public class ServerThread implements Runnable {
         if(clientMap.containsKey(threadId)) {
             clientMap.remove(threadId);
         }
-        System.err.println("Size: " + clientMap.size());
     }
 
     // send a message to e specific client

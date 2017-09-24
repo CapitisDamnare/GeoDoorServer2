@@ -21,7 +21,7 @@ public class ConnectionClientThreads implements Runnable {
     public interface ClientListener {
         public void onClientClosed(String id);
         // Todo: Send id from connection to ensure only connection with the same name
-        public void onMessage (String msg);
+        public void onMessage (String clientID, String msg);
     }
 
     // Implement Listener to send messages to the server thread
@@ -51,22 +51,13 @@ public class ConnectionClientThreads implements Runnable {
         try {
             while (true) {
                 line = inputStream.readLine();
-                System.err.println(clientID + " -> " + line);
-                listener.onMessage(line);
 
-                // Move this to the MessageHandler
-                if (line.compareTo("stop") == 0) {
-
-                    sendMessage("warum?");
+                if (line != null) {
+                    listener.onMessage(clientID, line);
+                    sendMessage(line);
                 }
-                if (line.contains("cmnd:")) {
-                    if (line.compareTo("cmnd:Andreas") == 0) {
-                        sendMessage("cmnd-name:true");
-                    }
-                    else
-                        sendMessage("cmnd-name:false");
-
-                }
+                else
+                    inputStream.close();
             }
         } catch (IOException ex) {
             LogHandler.handleError(ex);

@@ -7,8 +7,10 @@ public class MessageHandlerThread implements Runnable {
 
     BlockingQueue<String> queue;
     private boolean close = true;
+    DBHandler dbHandler = null;
 
-    public MessageHandlerThread() {
+    public MessageHandlerThread(DBHandler dbHandler) {
+        this.dbHandler = dbHandler;
         queue = new ArrayBlockingQueue<String>(1024);
     }
 
@@ -28,9 +30,33 @@ public class MessageHandlerThread implements Runnable {
         while (close) {
             if(queue.size() > 0) {
                 try {
-                    System.err.println("Size: " + queue.size() + " Took message: " + queue.take());
+                    String message = queue.take();
+                    System.err.println("Message Queue Size: " + queue.size());
+                    System.err.println(" Took message: " + message);
+
+                    String threadID = null;
+                    String command = null;
+                    if (message.contains("#")) {
+                        threadID = message.substring(0, message.indexOf("#"));
+                        message = message.replace(threadID + "#", "");
+                        command = message.substring(0, message.indexOf(":"));
+                        message = message.replace(command + ":", "");
+
+                        switch (command) {
+                            case "register":
+                                commandRegister(threadID, message);
+                                break;
+                            default:
+                                throw new GeoDoorExceptions("Sent socket command doesn't exist");
+                        }
+                    }
+                    else
+                        throw new GeoDoorExceptions("No identifier found!");
+
                 } catch (InterruptedException e) {
                     LogHandler.handleError(e);
+                } catch (GeoDoorExceptions geoDoorExceptions) {
+                    LogHandler.handleError(geoDoorExceptions);
                 }
             }
             try {
@@ -41,10 +67,45 @@ public class MessageHandlerThread implements Runnable {
         }
     }
 
+    // Todo: Add command handling for different commands
+
+    void commandRegister(String threadID, String message) {
+
+        String messageTemp = message;
+        String name = messageTemp.substring(0, messageTemp.indexOf("-"));
+        messageTemp = messageTemp.replace(name + "-", "");
+
+        String phoneId = messageTemp;
+
+        boolean checkPhoneID = dbHandler.checkClientByPhoneID(phoneId);
+        boolean checkName = dbHandler.checkClientByName(name);
+        boolean checkAllowed = dbHandler.checkAllowedByPhoneID(phoneId);
+
+        if (checkPhoneID) {
+            if (checkName) {
+                if (!checkAllowed) {
+                    System.out.println("phoneID and Name exists in DB");
+                    // Todo: send "not yet allowed"
+                    System.out.println("not yet allowed");
+                }
+            }
+            else {
+                // Todo: Update Name with new one
+                System.out.println("update new Name");
+                if (!checkAllowed) {
+                    // Todo: send "not yet allowed"
+                    System.out.println("not yet allowed2");
+                }
+            }
+        }
+        else {
+            // Todo: Create a new DB entry, send "registered wait for allowance" back
+            System.out.println("new DB entry");
+        }
+    }
+
     // Close the thread
     public void quit() {
         close = false;
     }
-
-    // Todo: Add command handling for different commands
 }
