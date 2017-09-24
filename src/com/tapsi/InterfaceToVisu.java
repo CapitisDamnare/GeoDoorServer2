@@ -4,17 +4,15 @@ import java.io.IOException;
 
 public class InterfaceToVisu {
     //private static Visualization visu = null;
-    GeoDoorServer2 server = null;
     
-    public InterfaceToVisu(GeoDoorServer2 server) {
-        this.server = server;
+    InterfaceToVisu() {
         //visu = new Visualization(this);
         //visu.setVisible(true);
     }
     
     public void startPressed() {
         try {
-            server.startServer();
+            GeoDoorServer2.startServer();
         } catch (InterruptedException ex) {
             LogHandler.handleError(ex);
         } catch (IOException ex) {
@@ -24,17 +22,17 @@ public class InterfaceToVisu {
     
     public void stopPressed() {
         try {
-            server.stopServer();
+            GeoDoorServer2.stopServer();
         } catch (GeoDoorExceptions ex) {
             LogHandler.handleError(ex);
         }
     }
     
-    public void showVisualization(boolean val) {
+    void showVisualization(boolean val) {
         //visu.showWindow(val);
     }
     
-    public void closeVisualisation() {
+    void closeVisualisation() {
         //visu.closeWindow();
     }
 }
