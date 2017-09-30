@@ -20,7 +20,6 @@ public class ConnectionClientThreads implements Runnable {
 
     public interface ClientListener {
         public void onClientClosed(String id);
-        // Todo: Send id from connection to ensure only connection with the same name
         public void onMessage (String clientID, String msg);
     }
 
@@ -54,12 +53,12 @@ public class ConnectionClientThreads implements Runnable {
 
                 if (line != null) {
                     listener.onMessage(clientID, line);
-                    sendMessage(line);
                 }
                 else
                     inputStream.close();
             }
         } catch (IOException ex) {
+            System.err.println("\nClientThread stopped from client");
             LogHandler.handleError(ex);
         } finally {
             try {
@@ -69,10 +68,10 @@ public class ConnectionClientThreads implements Runnable {
                 if (outputStream != null) {
                     outputStream.close();
                 }
-                System.err.println("\nClientThread stopped from client");
                 listener.onClientClosed(clientID);
                 socket.close();
             } catch (IOException ex) {
+                System.err.println("\nClientThread stopped from client");
                 LogHandler.handleError(ex);
             }
         }

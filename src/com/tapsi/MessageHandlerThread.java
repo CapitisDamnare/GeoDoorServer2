@@ -9,13 +9,23 @@ public class MessageHandlerThread implements Runnable {
     private boolean close = true;
     DBHandler dbHandler = null;
 
+    private messageListener listener;
+
+    public interface messageListener {
+        public void onClientAnswer(String threadID, String message);
+    }
+
+    public void setCustomListener(messageListener listener) {
+        this.listener = listener;
+    }
+
     public MessageHandlerThread(DBHandler dbHandler) {
         this.dbHandler = dbHandler;
         queue = new ArrayBlockingQueue<String>(1024);
     }
 
     // put a message from client Thread in the queue (That's thread safe!)
-    public void putMessage (String msg) {
+    public void putMessage(String msg) {
         try {
             queue.put(msg);
         } catch (InterruptedException e) {
@@ -28,7 +38,7 @@ public class MessageHandlerThread implements Runnable {
     public void run() {
         System.err.println("MessagHandlerThread started ...");
         while (close) {
-            if(queue.size() > 0) {
+            if (queue.size() > 0) {
                 try {
                     String message = queue.take();
                     System.err.println("Message Queue Size: " + queue.size());
@@ -49,8 +59,7 @@ public class MessageHandlerThread implements Runnable {
                             default:
                                 throw new GeoDoorExceptions("Sent socket command doesn't exist");
                         }
-                    }
-                    else
+                    } else
                         throw new GeoDoorExceptions("No identifier found!");
 
                 } catch (InterruptedException e) {
@@ -78,30 +87,19 @@ public class MessageHandlerThread implements Runnable {
         String phoneId = messageTemp;
 
         boolean checkPhoneID = dbHandler.checkClientByPhoneID(phoneId);
-        boolean checkName = dbHandler.checkClientByName(name);
         boolean checkAllowed = dbHandler.checkAllowedByPhoneID(phoneId);
 
         if (checkPhoneID) {
-            if (checkName) {
-                if (!checkAllowed) {
-                    System.out.println("phoneID and Name exists in DB");
-                    // Todo: send "not yet allowed"
-                    System.out.println("not yet allowed");
-                }
+            if (!checkAllowed) {
+                listener.onClientAnswer(threadID, "answer:not yet allowed");
             }
-            else {
-                // Todo: Update Name with new one
-                System.out.println("update new Name");
-                if (!checkAllowed) {
-                    // Todo: send "not yet allowed"
-                    System.out.println("not yet allowed2");
-                }
-            }
+            else
+                listener.onClientAnswer(threadID, "answer:allowed");
+        } else {
+            listener.onClientAnswer(threadID, "answer:registered ... waiting for allowance");
         }
-        else {
-            // Todo: Create a new DB entry, send "registered wait for allowance" back
-            System.out.println("new DB entry");
-        }
+        // Will automatically insert or update
+        dbHandler.insertClient(name, phoneId, threadID);
     }
 
     // Close the thread

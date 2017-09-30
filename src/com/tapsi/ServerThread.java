@@ -44,6 +44,7 @@ public class ServerThread implements Runnable {
 
         // Create and start MessageHandler
         msgHandler = new MessageHandlerThread(dbHandler);
+        initMessageListener(msgHandler);
         tHandlerThread = new Thread(msgHandler);
         tHandlerThread.start();
 
@@ -60,9 +61,9 @@ public class ServerThread implements Runnable {
             try {
                 socket = serverSocket.accept();
                 client = new ConnectionClientThreads(socket, socket.getRemoteSocketAddress().toString());
+                initClientListener(client);
                 pool.execute(client);
                 clientMap.put(socket.getRemoteSocketAddress().toString(), client);
-                initClientListener(client);
 
                 System.err.println("Thread Map Size: " + clientMap.size());
             } catch (IOException ex) {
@@ -88,7 +89,14 @@ public class ServerThread implements Runnable {
         });
     }
 
-    // Todo: Implement method to send a message to a specific thread or connected device
+    public void initMessageListener (MessageHandlerThread messageHandler) {
+        messageHandler.setCustomListener(new MessageHandlerThread.messageListener() {
+            @Override
+            public void onClientAnswer(String threadID, String message) {
+                sendMessageToDevice(threadID, message);
+            }
+        });
+    }
 
     // This wil shutdown all Threads for sure if they are finished with their tasks
     void shutdownAndAwaitTermination(ExecutorService pool) {
@@ -145,8 +153,8 @@ public class ServerThread implements Runnable {
     }
 
     // send a message to e specific client
-    public void sendMessagetoDevice (String sAddresse, String msg) {
-        ConnectionClientThreads currentUser = clientMap.get(sAddresse);
+    public void sendMessageToDevice (String threadID, String msg) {
+        ConnectionClientThreads currentUser = clientMap.get(threadID);
         currentUser.sendMessage(msg);
     }
 }

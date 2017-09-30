@@ -1,7 +1,6 @@
 package com.tapsi;
 
 
-import javax.print.DocFlavor;
 import java.sql.*;
 
 public class DBHandler {
@@ -35,44 +34,55 @@ public class DBHandler {
     }
 
     public void insertClient(String name, String phoneID, String threadID) {
-        insertClient(name, phoneID, threadID, 0);
+        boolean checkAllowed = checkAllowedByPhoneID(phoneID);
+
+        if (checkAllowed)
+            insertClient(name, phoneID, threadID, 1);
+        else
+            insertClient(name, phoneID, threadID, 0);
     }
 
     public void insertClient(String name, String phoneID, String threadID, int allowed) {
-        String sql = "insert into Clients(name, phoneID, threadID, allowed)" +
-                " select '" + name + "', '" + phoneID + "', '" + threadID + "', " + allowed;
-        try {
-            stmt.executeUpdate(sql);
-        } catch (SQLException e) {
-            LogHandler.handleError(e);
+
+        boolean checkPhoneID = checkClientByPhoneID(phoneID);
+        boolean checkName = checkClientByName(name);
+
+        if (!(checkName || checkPhoneID)) {
+            String sql = "insert into Clients(name, phoneID, threadID, allowed)" +
+                    " select '" + name + "', '" + phoneID + "', '" + threadID + "', " + allowed;
+            try {
+                stmt.executeUpdate(sql);
+            } catch (SQLException e) {
+                LogHandler.handleError(e);
+            }
         }
-        // If insert is not possible just try tp update the client
-        updateClient(name, phoneID, threadID, allowed);
+        else {
+            // If insert is not possible just try tp update the client
+            updateClient(name, phoneID, threadID, allowed);
+        }
     }
 
     public void updateClient(String name, String phoneID, String threadID, int allowed) {
-        // Todo: Also update threadId
-        String sqlName = "update Clients set phoneID = " + phoneID + ", allowed = " + allowed + " where name = '" + name + "'";
+        String sqlName = "update Clients set phoneID = '" + phoneID + "', threadID = '" + threadID + "', allowed = " + allowed + " where name = '" + name + "'";
         try {
             stmt.executeUpdate(sqlName);
         } catch (SQLException e) {
             LogHandler.handleError(e);
         }
-        String sqlThreadID = "update Clients set name = '" + name + "', allowed = " + allowed + " where phoneID = " + phoneID;
+        String sqlPhoneID = "update Clients set name = '" + name + "', threadID = '" + threadID + "', allowed = " + allowed + " where phoneID = '" + phoneID + "'";
         try {
-            stmt.executeUpdate(sqlThreadID);
+            stmt.executeUpdate(sqlPhoneID);
         } catch (SQLException e) {
             LogHandler.handleError(e);
         }
     }
 
     public boolean checkClientByPhoneID(String phoneID) {
-        String sql = "select count(*) from Clients where phoneID = " + phoneID;
+        String sql = "select count(*) from Clients where phoneID = '" + phoneID + "'";
         try {
             ResultSet rs = stmt.executeQuery(sql);
             rs.next();
             int result = rs.getInt(1);
-            System.out.println("Result checkClientByPhoneID: " + result);
             rs.close();
 
             if (result == 1)
@@ -95,7 +105,6 @@ public class DBHandler {
             ResultSet rs = stmt.executeQuery(sql);
             rs.next();
             int result = rs.getInt(1);
-            System.out.println("Result checkClientByName: " + result);
             rs.close();
 
             if (result == 1)
@@ -113,12 +122,11 @@ public class DBHandler {
     }
 
     public boolean checkAllowedByPhoneID(String phoneID) {
-        String sql = "select allowed from Clients where phoneID = " + phoneID;
+        String sql = "select allowed from Clients where phoneID = '" + phoneID + "'";
         try {
             ResultSet rs = stmt.executeQuery(sql);
             rs.next();
             int result = rs.getInt(1);
-            System.out.println("Result checkAllowedByPhoneID: " + result);
             rs.close();
 
             if (result == 1)
