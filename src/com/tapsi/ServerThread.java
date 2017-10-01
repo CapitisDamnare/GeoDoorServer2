@@ -20,6 +20,7 @@ public class ServerThread implements Runnable {
     DBHandler dbHandler = null;
 
     // KNXHandler to connect to the OpenHAB API
+    KNXHandler knxHandler = null;
     // Todo: Create KNXHandler
 
     // Client ExecutorService for the client threads
@@ -31,7 +32,7 @@ public class ServerThread implements Runnable {
     private Socket socket;
 
     // Thread Safe HashMap to safe and get access to the Client Threads
-    private ConcurrentHashMap<String,ConnectionClientThreads> clientMap;
+    private ConcurrentHashMap<String, ConnectionClientThreads> clientMap;
 
     // boolean to close the Thread
     private boolean close = true;
@@ -52,12 +53,14 @@ public class ServerThread implements Runnable {
         serverSocket = new ServerSocket(1234);
         pool = Executors.newFixedThreadPool(10);
         System.out.println("Server started...");
+
+        knxHandler = new KNXHandler();
     }
 
     // If a new client connects to the socket a new Thread will be started for the connection
     @Override
     public void run() {
-        while(close) {
+        while (close) {
             try {
                 socket = serverSocket.accept();
                 client = new ConnectionClientThreads(socket, socket.getRemoteSocketAddress().toString());
@@ -75,7 +78,7 @@ public class ServerThread implements Runnable {
     }
 
     // Client listener for every thread from the connected clients
-    public void initClientListener (ConnectionClientThreads client) {
+    public void initClientListener(ConnectionClientThreads client) {
         client.setCustomListener(new ConnectionClientThreads.ClientListener() {
             @Override
             public void onClientClosed(String id) {
@@ -89,7 +92,7 @@ public class ServerThread implements Runnable {
         });
     }
 
-    public void initMessageListener (MessageHandlerThread messageHandler) {
+    public void initMessageListener(MessageHandlerThread messageHandler) {
         messageHandler.setCustomListener(new MessageHandlerThread.messageListener() {
             @Override
             public void onClientAnswer(String threadID, String message) {
@@ -121,7 +124,12 @@ public class ServerThread implements Runnable {
     // Just a small test method.
     // Todo: Delete if not necessary anymore
     public void test() {
-        dbHandler.insertClient("Andreas2","89014103211118510720", "0");
+        try {
+            knxHandler.setItem();
+        } catch (IOException e) {
+            LogHandler.handleError(e);
+        }
+        //dbHandler.insertClient("Andreas2", "89014103211118510720", "0");
     }
 
     // Close all clientThreads, Server Thread and MessageHandler Thread
@@ -138,22 +146,22 @@ public class ServerThread implements Runnable {
     }
 
     // Close all client Threads registered in the map
-    public void closeClientThreads () {
-        for (Map.Entry<String,ConnectionClientThreads> entry : clientMap.entrySet() ) {
+    public void closeClientThreads() {
+        for (Map.Entry<String, ConnectionClientThreads> entry : clientMap.entrySet()) {
             ConnectionClientThreads mapClient = entry.getValue();
             mapClient.closeThread();
         }
     }
 
     // Delete a specific client Thread in the map
-    public void  deleteClient (String threadId) {
-        if(clientMap.containsKey(threadId)) {
+    public void deleteClient(String threadId) {
+        if (clientMap.containsKey(threadId)) {
             clientMap.remove(threadId);
         }
     }
 
     // send a message to e specific client
-    public void sendMessageToDevice (String threadID, String msg) {
+    public void sendMessageToDevice(String threadID, String msg) {
         ConnectionClientThreads currentUser = clientMap.get(threadID);
         currentUser.sendMessage(msg);
     }
