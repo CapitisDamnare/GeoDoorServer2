@@ -20,12 +20,13 @@ public class DBHandler {
         }
         System.err.println("Connected to DB!");
 
+        // Todo: insert register Date Time and insert last register command date time
         // Create table if not existent
         try {
             stmt = c.createStatement();
             String sql = "create table if not exists Clients " +
                     "(id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE, " +
-                    "name TEXT NOT NULL UNIQUE, phoneID TEXT NOT NULL UNIQUE, threadID TEXT UNIQUE, allowed INTEGER DEFAULT 0)";
+                    "name TEXT NOT NULL, phoneID TEXT NOT NULL UNIQUE, threadID TEXT UNIQUE, allowed INTEGER DEFAULT 0)";
             stmt.executeUpdate(sql);
         } catch (SQLException e) {
             LogHandler.handleError(e);
@@ -45,9 +46,9 @@ public class DBHandler {
     public void insertClient(String name, String phoneID, String threadID, int allowed) {
 
         boolean checkPhoneID = checkClientByPhoneID(phoneID);
-        boolean checkName = checkClientByName(name);
+        //boolean checkName = checkClientByName(name);
 
-        if (!(checkName || checkPhoneID)) {
+        if (!checkPhoneID) {
             String sql = "insert into Clients(name, phoneID, threadID, allowed)" +
                     " select '" + name + "', '" + phoneID + "', '" + threadID + "', " + allowed;
             try {
@@ -63,7 +64,7 @@ public class DBHandler {
     }
 
     public void updateClient(String name, String phoneID, String threadID, int allowed) {
-        String sqlName = "update Clients set phoneID = '" + phoneID + "', threadID = '" + threadID + "', allowed = " + allowed + " where name = '" + name + "'";
+        String sqlName = "update Clients set threadID = '" + threadID + "', allowed = " + allowed + " where name = '" + name + "'";
         try {
             stmt.executeUpdate(sqlName);
         } catch (SQLException e) {

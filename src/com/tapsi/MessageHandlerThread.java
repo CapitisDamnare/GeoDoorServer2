@@ -77,6 +77,8 @@ public class MessageHandlerThread implements Runnable {
     }
 
     // Todo: Add command handling for different commands
+    // Todo: Add commandOutput "output:" to open and close gates "output:Gate1 open"
+    // Todo: Check if user is allowed to send commands (If not don't answer)
 
     void commandRegister(String threadID, String message) {
 
@@ -96,7 +98,7 @@ public class MessageHandlerThread implements Runnable {
             else
                 listener.onClientAnswer(threadID, "answer:allowed");
         } else {
-            listener.onClientAnswer(threadID, "answer:registered ... waiting for allowance");
+            listener.onClientAnswer(threadID, "answer:registered ... waiting for permission");
         }
         // Will automatically insert or update
         dbHandler.insertClient(name, phoneId, threadID);

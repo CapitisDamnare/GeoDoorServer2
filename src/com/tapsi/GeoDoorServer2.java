@@ -29,6 +29,7 @@ public class GeoDoorServer2 {
         }
     }
 
+    // Todo: add console command to list and give permission to user
     // Console Commands
     private static void checkCommand(String command) throws GeoDoorExceptions{
         switch (command) {
