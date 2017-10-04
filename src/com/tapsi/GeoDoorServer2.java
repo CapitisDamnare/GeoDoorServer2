@@ -52,8 +52,11 @@ public class GeoDoorServer2 {
             }
                 break;
             }
-            case "test":
-                serverThread.test();
+            case "test1":
+                serverThread.test("ON");
+                break;
+            case "test2":
+                serverThread.test("OFF");
                 break;
             default:
                 throw new GeoDoorExceptions("Command not found");

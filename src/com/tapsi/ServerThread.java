@@ -3,7 +3,6 @@ package com.tapsi;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -123,9 +122,9 @@ public class ServerThread implements Runnable {
 
     // Just a small test method.
     // Todo: Delete if not necessary anymore
-    public void test() {
+    public void test(String value) {
         try {
-            knxHandler.setItem();
+            knxHandler.setItem(value);
         } catch (IOException e) {
             LogHandler.handleError(e);
         }
