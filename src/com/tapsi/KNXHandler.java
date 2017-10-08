@@ -8,14 +8,24 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Handler;
 
 public class KNXHandler {
 
-    Handler timerHandler = new Handler();
+    public Timer timer = null;
+    public TimerTask timerTask = null;
+
+    public KNXHandler() {
+        timerTask = new RepeatTimer();
+        timer = new Timer(true);
+        timer.schedule(timerTask,0,10 * 1000);
+    }
 
     public void setItem(String parameter) throws IOException {
-        String url = "http://192.168.1.112:8080/rest/items/eg_wand";
+        String url = "http://192.168.1.112:8080/rest/items/eg_buero";
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
@@ -54,7 +64,11 @@ public class KNXHandler {
     }
 
     public String getItem() {
-        String url = "http://192.168.1.112:8080/rest/items/eg_wand/state";
+
+        timer.cancel();
+        System.out.println("timer canceled");
+
+        String url = "http://192.168.1.112:8080/rest/items/eg_buero/state";
         String value = "";
 
         URL obj = null;
@@ -99,5 +113,19 @@ public class KNXHandler {
         }
 
         return value;
+    }
+
+    public class  RepeatTimer extends java.util.TimerTask {
+
+        @Override
+        public void run() {
+            System.out.println("started timer @:" + new Date());
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                LogHandler.handleError(e);
+            }
+            System.out.println("ended timer @:" + new Date());
+        }
     }
 }
