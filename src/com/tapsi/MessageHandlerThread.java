@@ -1,5 +1,6 @@
 package com.tapsi;
 
+import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -8,6 +9,7 @@ public class MessageHandlerThread implements Runnable {
     BlockingQueue<String> queue;
     private boolean close = true;
     DBHandler dbHandler = null;
+    KNXHandler knxHandler = null;
 
     private messageListener listener;
 
@@ -19,8 +21,9 @@ public class MessageHandlerThread implements Runnable {
         this.listener = listener;
     }
 
-    public MessageHandlerThread(DBHandler dbHandler) {
+    public MessageHandlerThread(DBHandler dbHandler, KNXHandler knxHandler) {
         this.dbHandler = dbHandler;
+        this.knxHandler = knxHandler;
         queue = new ArrayBlockingQueue<String>(1024);
     }
 
@@ -36,13 +39,12 @@ public class MessageHandlerThread implements Runnable {
     // Check permanently the queue for new messages to handle
     @Override
     public void run() {
-        System.err.println("MessagHandlerThread started ...");
+        System.out.println("MessagHandlerThread started ...");
         while (close) {
             if (queue.size() > 0) {
                 try {
                     String message = queue.take();
-                    System.err.println("Message Queue Size: " + queue.size());
-                    System.err.println(" Took message: " + message);
+                    System.out.println(" Took message: " + message);
 
                     String threadID = null;
                     String command = null;
@@ -55,6 +57,9 @@ public class MessageHandlerThread implements Runnable {
                         switch (command) {
                             case "register":
                                 commandRegister(threadID, message);
+                                break;
+                            case "output":
+                                commandOutput(message);
                                 break;
                             default:
                                 throw new GeoDoorExceptions("Sent socket command doesn't exist");
@@ -76,9 +81,42 @@ public class MessageHandlerThread implements Runnable {
         }
     }
 
-    // Todo: Add command handling for different commands
-    // Todo: Add commandOutput "output:" to open and close gates "output:Gate1 open"
-    // Todo: Check if user is allowed to send commands (If not don't answer)
+    void commandOutput(String message) {
+        String messageTemp = message;
+        String msg = messageTemp.substring(0, messageTemp.indexOf("-"));
+        messageTemp = messageTemp.replace(msg + "-", "");
+
+        String phoneId = messageTemp;
+
+        boolean checkPhoneID = dbHandler.checkClientByPhoneID(phoneId);
+        boolean checkAllowed = dbHandler.checkAllowedByPhoneID(phoneId);
+
+        if (checkPhoneID)
+            if (checkAllowed) {
+                switch (msg) {
+                    case "Gate1 open":
+                        try {
+                            knxHandler.setItem("eg_tor","ON");
+                        } catch (IOException e) {
+                           LogHandler.handleError(e);
+                        }
+                        break;
+                    case "Door1 open":
+                        try {
+                            knxHandler.setItem("eg_tuer","ON");
+                        } catch (IOException e) {
+                            LogHandler.handleError(e);
+                        }
+                        break;
+                    default:
+                        try {
+                            throw new GeoDoorExceptions("Output command doesn't exist");
+                        } catch (GeoDoorExceptions geoDoorExceptions) {
+                            LogHandler.handleError(geoDoorExceptions);
+                        }
+                }
+            }
+    }
 
     void commandRegister(String threadID, String message) {
 

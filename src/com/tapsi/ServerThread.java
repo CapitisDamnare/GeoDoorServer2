@@ -3,6 +3,7 @@ package com.tapsi;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -20,7 +21,6 @@ public class ServerThread implements Runnable {
 
     // KNXHandler to connect to the OpenHAB API
     KNXHandler knxHandler = null;
-    // Todo: Create KNXHandler
 
     // Client ExecutorService for the client threads
     private final ExecutorService pool;
@@ -42,8 +42,12 @@ public class ServerThread implements Runnable {
 
         clientMap = new ConcurrentHashMap<>();
 
+        // Create KNX Handler and init Listener
+        knxHandler = new KNXHandler();
+        initKNXListener(knxHandler);
+
         // Create and start MessageHandler
-        msgHandler = new MessageHandlerThread(dbHandler);
+        msgHandler = new MessageHandlerThread(dbHandler, knxHandler);
         initMessageListener(msgHandler);
         tHandlerThread = new Thread(msgHandler);
         tHandlerThread.start();
@@ -52,8 +56,6 @@ public class ServerThread implements Runnable {
         serverSocket = new ServerSocket(1234);
         pool = Executors.newFixedThreadPool(10);
         System.out.println("Server started...");
-
-        knxHandler = new KNXHandler();
     }
 
     // If a new client connects to the socket a new Thread will be started for the connection
@@ -67,12 +69,12 @@ public class ServerThread implements Runnable {
                 pool.execute(client);
                 clientMap.put(socket.getRemoteSocketAddress().toString(), client);
 
-                System.err.println("Thread Map Size: " + clientMap.size());
+                System.out.println("Thread Map Size: " + clientMap.size());
             } catch (IOException ex) {
                 LogHandler.handleError(ex);
             }
         }
-        System.err.println("Server stopped");
+        System.out.println("Server stopped");
         shutdownAndAwaitTermination(pool);
     }
 
@@ -100,6 +102,23 @@ public class ServerThread implements Runnable {
         });
     }
 
+    public void initKNXListener(KNXHandler knxHandler) {
+        knxHandler.setCustomListener(new KNXHandler.KNXListener() {
+            @Override
+            public void onDoorStatChanged(int value) {
+                for (Map.Entry<String, ConnectionClientThreads> entry : clientMap.entrySet()) {
+                    ConnectionClientThreads mapClient = entry.getValue();
+                    if(value == 4)
+                        mapClient.sendMessage("answer:door1 open");
+                    else if (value == 0)
+                        mapClient.sendMessage("answer:door1 close");
+                    else if (value == 2)
+                        mapClient.sendMessage("answer:door1 stopped");
+                }
+            }
+        });
+    }
+
     // This wil shutdown all Threads for sure if they are finished with their tasks
     void shutdownAndAwaitTermination(ExecutorService pool) {
         pool.shutdown(); // Disable new tasks from being submitted
@@ -108,7 +127,7 @@ public class ServerThread implements Runnable {
                 pool.shutdownNow(); // Cancel currently executing tasks
                 // Wait a while for tasks to respond to being cancelled
                 if (!pool.awaitTermination(10, TimeUnit.SECONDS)) {
-                    System.err.println("Pool did not terminate");
+                    System.out.println("Pool did not terminate");
                 }
             }
         } catch (InterruptedException ex) {
@@ -124,7 +143,7 @@ public class ServerThread implements Runnable {
     // Todo: Delete if not necessary anymore
     public void test(String value) {
         try {
-            knxHandler.setItem(value);
+            knxHandler.setItem("eg_tor",value);
         } catch (IOException e) {
             LogHandler.handleError(e);
         }
@@ -139,6 +158,7 @@ public class ServerThread implements Runnable {
             closeClientThreads();
             msgHandler.quit();
             dbHandler.closeDB();
+            knxHandler.stopTimer();
         } catch (IOException ex) {
             LogHandler.handleError(ex);
         }
@@ -163,5 +183,18 @@ public class ServerThread implements Runnable {
     public void sendMessageToDevice(String threadID, String msg) {
         ConnectionClientThreads currentUser = clientMap.get(threadID);
         currentUser.sendMessage(msg);
+    }
+
+    // Starts or stops the server
+    public void startKNXTimer() {
+        knxHandler.startTimer();
+    }
+
+    public void stopKNXHandler() {
+        knxHandler.stopTimer();
+    }
+
+    public  void getKNXItem() {
+        knxHandler.getItem("eg_tor_stat");
     }
 }

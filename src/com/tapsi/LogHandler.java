@@ -5,28 +5,44 @@ import java.sql.SQLException;
 
 public class LogHandler {
 
+    private static boolean debugMode = false;
+
+    public static boolean isDebugMode() {
+        return debugMode;
+    }
+
+    public static void setDebugMode(boolean debugMode) {
+        LogHandler.debugMode = debugMode;
+    }
+
     public static void handleError(GeoDoorExceptions ex) {
-        ex.printStackTrace();
+        if (debugMode)
+            ex.printStackTrace();
     }
 
     public static void handleError(InterruptedException ex) {
-        ex.printStackTrace();
+        if (debugMode)
+            ex.printStackTrace();
     }
 
     public static void handleError(IOException ex) {
-        ex.printStackTrace();
+        if (debugMode)
+            ex.printStackTrace();
     }
 
     public static void handleError(ClassNotFoundException ex) {
-        ex.printStackTrace();
+        if (debugMode)
+            ex.printStackTrace();
     }
 
     public static void handleError(SQLException ex) {
-        ex.printStackTrace();
+        if (debugMode)
+            ex.printStackTrace();
     }
 
     public static void handleError(Exception ex) {
-        ex.printStackTrace();
+        if (debugMode)
+            ex.printStackTrace();
     }
 
     public static void printPrompt() {

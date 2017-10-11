@@ -11,6 +11,9 @@ public class GeoDoorServer2 {
     private static boolean quit = false;
 
     public static void main(String[] args) {
+
+        LogHandler.setDebugMode(true);
+
         // Create instance of the server
         inVisu = new InterfaceToVisu();
         
@@ -30,6 +33,9 @@ public class GeoDoorServer2 {
     }
 
     // Todo: add console command to list and give permission to user
+    // Todo: add command to check connected users
+    // Todo: add command to set debug mode on or off
+    // Todo: add command to check message queue
     // Console Commands
     private static void checkCommand(String command) throws GeoDoorExceptions{
         switch (command) {
@@ -52,6 +58,15 @@ public class GeoDoorServer2 {
             }
                 break;
             }
+            case "knx on":
+                serverThread.startKNXTimer();
+                break;
+            case "knx off":
+                serverThread.stopKNXHandler();
+                break;
+            case "knx get":
+                serverThread.getKNXItem();
+                break;
             case "test1":
                 serverThread.test("ON");
                 break;

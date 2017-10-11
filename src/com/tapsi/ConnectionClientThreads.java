@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+// Todo: Add send status door signal after successful connection to the server
+
 public class ConnectionClientThreads implements Runnable {
 
     private String clientID = null;
@@ -37,8 +39,8 @@ public class ConnectionClientThreads implements Runnable {
     // Create a new input and output stream and wait for incoming messages
     @Override
     public void run() {
-        System.err.println("");
-        System.err.println("ClientThread " + socket.getRemoteSocketAddress().toString() + " started ...");
+        System.out.println("");
+        System.out.println("ClientThread " + socket.getRemoteSocketAddress().toString() + " started ...");
 
         try {
             inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -58,7 +60,7 @@ public class ConnectionClientThreads implements Runnable {
                     inputStream.close();
             }
         } catch (IOException ex) {
-            System.err.println("\nClientThread stopped from client");
+            System.out.println("\nClientThread stopped from client");
             LogHandler.handleError(ex);
         } finally {
             try {
@@ -71,7 +73,7 @@ public class ConnectionClientThreads implements Runnable {
                 listener.onClientClosed(clientID);
                 socket.close();
             } catch (IOException ex) {
-                System.err.println("\nClientThread stopped from client");
+                System.out.println("\nClientThread stopped from client");
                 LogHandler.handleError(ex);
             }
         }
@@ -92,7 +94,7 @@ public class ConnectionClientThreads implements Runnable {
             if (outputStream != null) {
                 outputStream.close();
             }
-            System.err.println("\nClientThread stopped from Server");
+            System.out.println("\nClientThread stopped from Server");
             LogHandler.printPrompt();
             socket.close();
         } catch (IOException ex) {

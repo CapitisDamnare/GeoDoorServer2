@@ -18,7 +18,7 @@ public class DBHandler {
         } catch (SQLException e) {
             LogHandler.handleError(e);
         }
-        System.err.println("Connected to DB!");
+        System.out.println("Connected to DB!");
 
         // Todo: insert register Date Time and insert last register command date time
         // Create table if not existent
