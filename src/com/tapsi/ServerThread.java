@@ -3,8 +3,7 @@ package com.tapsi;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,6 +35,10 @@ public class ServerThread implements Runnable {
     // boolean to close the Thread
     private boolean close = true;
 
+    // PingTimer for periddic connection checks
+    public Timer timer = null;
+    public PingTimer pingTimerTask = null;
+
     public ServerThread() throws IOException {
         // Create or open DB
         dbHandler = new DBHandler();
@@ -51,6 +54,9 @@ public class ServerThread implements Runnable {
         initMessageListener(msgHandler);
         tHandlerThread = new Thread(msgHandler);
         tHandlerThread.start();
+
+        // Start the PingTimer Thread
+        startPingTimer();
 
         // Start the Server
         serverSocket = new ServerSocket(1234);
@@ -69,7 +75,7 @@ public class ServerThread implements Runnable {
                 pool.execute(client);
                 clientMap.put(socket.getRemoteSocketAddress().toString(), client);
 
-                System.out.println("Thread Map Size: " + clientMap.size());
+                System.out.println(new Date() + ": Thread Map Size: " + clientMap.size());
             } catch (IOException ex) {
                 LogHandler.handleError(ex);
             }
@@ -96,7 +102,15 @@ public class ServerThread implements Runnable {
     public void initMessageListener(MessageHandlerThread messageHandler) {
         messageHandler.setCustomListener(new MessageHandlerThread.messageListener() {
             @Override
-            public void onClientAnswer(String threadID, String message) {
+            public void onClientAnswer(String oldThreadID, String threadID, String message) {
+
+                // old ThreadID ist still active - close and delete it
+                if (clientMap.containsKey(oldThreadID)) {
+                    ConnectionClientThreads mapClient = clientMap.get(oldThreadID);
+                    mapClient.closeThread();
+                    clientMap.remove(oldThreadID);
+                    System.out.println(new Date() + ": Closed old active connection: " + oldThreadID);
+                }
                 sendMessageToDevice(threadID, message);
             }
         });
@@ -142,10 +156,9 @@ public class ServerThread implements Runnable {
     // Just a small test method.
     // Todo: Delete if not necessary anymore
     public void test(String value) {
-        try {
-            knxHandler.setItem("eg_tor",value);
-        } catch (IOException e) {
-            LogHandler.handleError(e);
+        for (Map.Entry<String, ConnectionClientThreads> entry : clientMap.entrySet()) {
+            ConnectionClientThreads mapClient = entry.getValue();
+            mapClient.sendMessage("answer:ping");
         }
         //dbHandler.insertClient("Andreas2", "89014103211118510720", "0");
     }
@@ -159,6 +172,7 @@ public class ServerThread implements Runnable {
             msgHandler.quit();
             dbHandler.closeDB();
             knxHandler.stopTimer();
+            stopPingTimer();
         } catch (IOException ex) {
             LogHandler.handleError(ex);
         }
@@ -177,12 +191,20 @@ public class ServerThread implements Runnable {
         if (clientMap.containsKey(threadId)) {
             clientMap.remove(threadId);
         }
+        System.out.println(new Date() + ": Thread Map Size: " + clientMap.size());
     }
 
     // send a message to e specific client
     public void sendMessageToDevice(String threadID, String msg) {
         ConnectionClientThreads currentUser = clientMap.get(threadID);
         currentUser.sendMessage(msg);
+    }
+
+    public void broadcastMessage () {
+        for (Map.Entry<String, ConnectionClientThreads> entry : clientMap.entrySet()) {
+            ConnectionClientThreads mapClient = entry.getValue();
+            mapClient.sendMessage("answer:ping");
+        }
     }
 
     // Starts or stops the server
@@ -197,4 +219,23 @@ public class ServerThread implements Runnable {
     public  void getKNXItem() {
         knxHandler.getItem("eg_tor_stat");
     }
+
+    public void stopPingTimer () {
+        timer.cancel();
+    }
+
+    public  void startPingTimer() {
+        pingTimerTask = new PingTimer();
+        timer = new Timer(true);
+        timer.schedule(pingTimerTask,0,20000);
+    }
+
+    public class PingTimer extends TimerTask {
+
+        @Override
+        public void run() {
+            broadcastMessage();
+        }
+    }
+
 }

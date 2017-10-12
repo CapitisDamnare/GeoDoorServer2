@@ -144,6 +144,22 @@ public class DBHandler {
         return false;
     }
 
+    public String selectThreadIDByName(String name) {
+        String sql = "select threadID from Clients where name = '" + name + "'";
+        try {
+            ResultSet rs = stmt.executeQuery(sql);
+            rs.next();
+            String result = rs.getString(1);
+            rs.close();
+
+            return result;
+
+        } catch (SQLException e) {
+            LogHandler.handleError(e);
+            return "";
+        }
+    }
+
     public void closeDB() {
         try {
             stmt.close();

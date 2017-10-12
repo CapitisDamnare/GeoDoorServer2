@@ -58,6 +58,12 @@ public class GeoDoorServer2 {
             }
                 break;
             }
+            case "debug on":
+                LogHandler.setDebugMode(true);
+                break;
+            case "debug off":
+                LogHandler.setDebugMode(false);
+                break;
             case "knx on":
                 serverThread.startKNXTimer();
                 break;

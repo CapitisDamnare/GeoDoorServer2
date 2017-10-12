@@ -1,6 +1,7 @@
 package com.tapsi;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -14,7 +15,7 @@ public class MessageHandlerThread implements Runnable {
     private messageListener listener;
 
     public interface messageListener {
-        public void onClientAnswer(String threadID, String message);
+        public void onClientAnswer(String oldThreadID, String threadID, String message);
     }
 
     public void setCustomListener(messageListener listener) {
@@ -44,7 +45,7 @@ public class MessageHandlerThread implements Runnable {
             if (queue.size() > 0) {
                 try {
                     String message = queue.take();
-                    System.out.println(" Took message: " + message);
+                    System.out.println(new Date() + ": Took message: " + message);
 
                     String threadID = null;
                     String command = null;
@@ -60,6 +61,9 @@ public class MessageHandlerThread implements Runnable {
                                 break;
                             case "output":
                                 commandOutput(message);
+                                break;
+                            case "pong":
+                                System.out.println(message);
                                 break;
                             default:
                                 throw new GeoDoorExceptions("Sent socket command doesn't exist");
@@ -129,14 +133,16 @@ public class MessageHandlerThread implements Runnable {
         boolean checkPhoneID = dbHandler.checkClientByPhoneID(phoneId);
         boolean checkAllowed = dbHandler.checkAllowedByPhoneID(phoneId);
 
+        String oldThreadID = dbHandler.selectThreadIDByName(name);
+
         if (checkPhoneID) {
             if (!checkAllowed) {
-                listener.onClientAnswer(threadID, "answer:not yet allowed");
+                listener.onClientAnswer(oldThreadID, threadID, "answer:not yet allowed");
             }
             else
-                listener.onClientAnswer(threadID, "answer:allowed");
+                listener.onClientAnswer(oldThreadID, threadID,  "answer:allowed");
         } else {
-            listener.onClientAnswer(threadID, "answer:registered ... waiting for permission");
+            listener.onClientAnswer(oldThreadID, threadID, "answer:registered ... waiting for permission");
         }
         // Will automatically insert or update
         dbHandler.insertClient(name, phoneId, threadID);

@@ -79,7 +79,7 @@ public class KNXHandler {
         in.close();
 
         //print result
-        System.out.println(response.toString());
+        System.out.println(new Date() + ": knx response: " +response.toString());
     }
 
     public String getItem(String item) {

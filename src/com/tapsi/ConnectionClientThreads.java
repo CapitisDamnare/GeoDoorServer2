@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Date;
 
 // Todo: Add send status door signal after successful connection to the server
 
@@ -39,8 +40,7 @@ public class ConnectionClientThreads implements Runnable {
     // Create a new input and output stream and wait for incoming messages
     @Override
     public void run() {
-        System.out.println("");
-        System.out.println("ClientThread " + socket.getRemoteSocketAddress().toString() + " started ...");
+        System.out.println(new Date() + ": ClientThread " + clientID + " started ...");
 
         try {
             inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -60,7 +60,7 @@ public class ConnectionClientThreads implements Runnable {
                     inputStream.close();
             }
         } catch (IOException ex) {
-            System.out.println("\nClientThread stopped from client");
+            System.out.println(new Date() + ": ClientThread stopped from client -> " + clientID);
             LogHandler.handleError(ex);
         } finally {
             try {
@@ -73,7 +73,7 @@ public class ConnectionClientThreads implements Runnable {
                 listener.onClientClosed(clientID);
                 socket.close();
             } catch (IOException ex) {
-                System.out.println("\nClientThread stopped from client");
+                System.out.println(new Date() + ": ClientThread stopped from client -> " + clientID);
                 LogHandler.handleError(ex);
             }
         }
@@ -94,7 +94,7 @@ public class ConnectionClientThreads implements Runnable {
             if (outputStream != null) {
                 outputStream.close();
             }
-            System.out.println("\nClientThread stopped from Server");
+            System.out.println(new Date() + ": ClientThread stopped from server -> " + clientID);
             LogHandler.printPrompt();
             socket.close();
         } catch (IOException ex) {

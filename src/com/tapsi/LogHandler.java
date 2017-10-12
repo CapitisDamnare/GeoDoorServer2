@@ -2,6 +2,7 @@ package com.tapsi;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Date;
 
 public class LogHandler {
 
@@ -16,33 +17,45 @@ public class LogHandler {
     }
 
     public static void handleError(GeoDoorExceptions ex) {
-        if (debugMode)
+        if (debugMode) {
+            System.err.println(new Date() + ": got Exception:");
             ex.printStackTrace();
+        }
     }
 
     public static void handleError(InterruptedException ex) {
-        if (debugMode)
+        if (debugMode) {
+            System.err.println(new Date() + ": got Exception:");
             ex.printStackTrace();
+        }
     }
 
     public static void handleError(IOException ex) {
-        if (debugMode)
+        if (debugMode) {
+            System.err.println(new Date() + ": got Exception:");
             ex.printStackTrace();
+        }
     }
 
     public static void handleError(ClassNotFoundException ex) {
-        if (debugMode)
+        if (debugMode) {
+            System.err.println(new Date() + ": got Exception:");
             ex.printStackTrace();
+        }
     }
 
     public static void handleError(SQLException ex) {
-        if (debugMode)
+        if (debugMode) {
+            System.err.println(new Date() + ": got Exception:");
             ex.printStackTrace();
+        }
     }
 
     public static void handleError(Exception ex) {
-        if (debugMode)
+        if (debugMode) {
+            System.err.println(new Date() + ": got Exception:");
             ex.printStackTrace();
+        }
     }
 
     public static void printPrompt() {
