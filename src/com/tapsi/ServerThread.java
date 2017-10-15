@@ -130,6 +130,15 @@ public class ServerThread implements Runnable {
                         mapClient.sendMessage("answer:door1 stopped");
                 }
             }
+
+            @Override
+            public void onAutomaticDoorClose() {
+                try {
+                    knxHandler.setItem("eg_tor","ON");
+                } catch (IOException e) {
+                    LogHandler.handleError(e);
+                }
+            }
         });
     }
 
@@ -156,11 +165,12 @@ public class ServerThread implements Runnable {
     // Just a small test method.
     // Todo: Delete if not necessary anymore
     public void test(String value) {
-        for (Map.Entry<String, ConnectionClientThreads> entry : clientMap.entrySet()) {
-            ConnectionClientThreads mapClient = entry.getValue();
-            mapClient.sendMessage("answer:ping");
+        try {
+            knxHandler.setItem("eg_buero",value);
+        } catch (IOException e) {
+            LogHandler.handleError(e);
         }
-        //dbHandler.insertClient("Andreas2", "89014103211118510720", "0");
+        //dbHandler.insertClient("xxx", "89014103211118510720", "0");
     }
 
     // Close all clientThreads, Server Thread and MessageHandler Thread
@@ -244,6 +254,23 @@ public class ServerThread implements Runnable {
         @Override
         public void run() {
             broadcastMessage();
+        }
+    }
+
+    public void setDoorStatus (boolean value) {
+        knxHandler.setOpenDoorStatus(value);
+    }
+
+    public String getMessageQueueSize () {
+        return String.valueOf(msgHandler.getQueueSize());
+    }
+
+    public void getUsers () {
+        for (Map.Entry<String, ConnectionClientThreads> entry : clientMap.entrySet()) {
+            ConnectionClientThreads mapClient = entry.getValue();
+            String name = dbHandler.selectNameByThreadID(mapClient.getClientID());
+            String lastConnection = dbHandler.selectLastConnectionByThreadID(mapClient.getClientID());
+            System.out.println("Name: " + name + " - last connection at: " + lastConnection);
         }
     }
 

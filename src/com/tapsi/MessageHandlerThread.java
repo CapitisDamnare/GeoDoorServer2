@@ -28,6 +28,10 @@ public class MessageHandlerThread implements Runnable {
         queue = new ArrayBlockingQueue<String>(1024);
     }
 
+    public int getQueueSize() {
+        return queue.size();
+    }
+
     // put a message from client Thread in the queue (That's thread safe!)
     public void putMessage(String msg) {
         try {
@@ -45,7 +49,7 @@ public class MessageHandlerThread implements Runnable {
             if (queue.size() > 0) {
                 try {
                     String message = queue.take();
-                    System.out.println(new Date() + ": Took message: " + message);
+                    String original = message;
 
                     String threadID = null;
                     String command = null;
@@ -57,20 +61,23 @@ public class MessageHandlerThread implements Runnable {
 
                         switch (command) {
                             case "register":
+                                System.out.println(new Date() + ": Took message: " + original);
                                 commandRegister(threadID, message);
                                 break;
                             case "output":
+                                System.out.println(new Date() + ": Took message: " + original);
                                 commandOutput(message);
                                 break;
                             case "pong":
-                                System.out.println(message);
+                                //System.out.println(new Date() + ": Took message: " + original);
                                 break;
                             default:
                                 throw new GeoDoorExceptions("Sent socket command doesn't exist");
                         }
                     } else
                         throw new GeoDoorExceptions("No identifier found!");
-
+                } catch (StringIndexOutOfBoundsException e) {
+                    LogHandler.handleError(e);
                 } catch (InterruptedException e) {
                     LogHandler.handleError(e);
                 } catch (GeoDoorExceptions geoDoorExceptions) {
@@ -80,7 +87,10 @@ public class MessageHandlerThread implements Runnable {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
+                System.out.println("here3");
+
                 LogHandler.handleError(e);
+                run();
             }
         }
     }
@@ -103,6 +113,14 @@ public class MessageHandlerThread implements Runnable {
                             knxHandler.setItem("eg_tor","ON");
                         } catch (IOException e) {
                            LogHandler.handleError(e);
+                        }
+                        break;
+                    case "Gate1 open auto":
+                        try {
+                            knxHandler.setItem("eg_tor","ON");
+                            knxHandler.startAutoModeTimer();
+                        } catch (IOException e) {
+                            LogHandler.handleError(e);
                         }
                         break;
                     case "Door1 open":
@@ -139,8 +157,10 @@ public class MessageHandlerThread implements Runnable {
             if (!checkAllowed) {
                 listener.onClientAnswer(oldThreadID, threadID, "answer:not yet allowed");
             }
-            else
+            else {
                 listener.onClientAnswer(oldThreadID, threadID,  "answer:allowed");
+                knxHandler.getDoorStatus();
+            }
         } else {
             listener.onClientAnswer(oldThreadID, threadID, "answer:registered ... waiting for permission");
         }

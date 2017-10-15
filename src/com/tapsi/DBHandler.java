@@ -2,6 +2,7 @@ package com.tapsi;
 
 
 import java.sql.*;
+import java.util.Date;
 
 public class DBHandler {
     private Connection c = null;
@@ -20,18 +21,16 @@ public class DBHandler {
         }
         System.out.println("Connected to DB!");
 
-        // Todo: insert register Date Time and insert last register command date time
         // Create table if not existent
         try {
             stmt = c.createStatement();
             String sql = "create table if not exists Clients " +
                     "(id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE, " +
-                    "name TEXT NOT NULL, phoneID TEXT NOT NULL UNIQUE, threadID TEXT UNIQUE, allowed INTEGER DEFAULT 0)";
+                    "name TEXT NOT NULL, phoneID TEXT NOT NULL UNIQUE, threadID TEXT UNIQUE, allowed INTEGER DEFAULT 0, lastConnection TEXT)";
             stmt.executeUpdate(sql);
         } catch (SQLException e) {
             LogHandler.handleError(e);
         }
-        //insertClient("Andreas",1);
     }
 
     public void insertClient(String name, String phoneID, String threadID) {
@@ -49,8 +48,8 @@ public class DBHandler {
         //boolean checkName = checkClientByName(name);
 
         if (!checkPhoneID) {
-            String sql = "insert into Clients(name, phoneID, threadID, allowed)" +
-                    " select '" + name + "', '" + phoneID + "', '" + threadID + "', " + allowed;
+            String sql = "insert into Clients(name, phoneID, threadID, allowed, lastConnection)" +
+                    " select '" + name + "', '" + phoneID + "', '" + threadID + "', " + allowed + ", '" + new Date() + "'";
             try {
                 stmt.executeUpdate(sql);
             } catch (SQLException e) {
@@ -64,13 +63,13 @@ public class DBHandler {
     }
 
     public void updateClient(String name, String phoneID, String threadID, int allowed) {
-        String sqlName = "update Clients set threadID = '" + threadID + "', allowed = " + allowed + " where name = '" + name + "'";
+        String sqlName = "update Clients set threadID = '" + threadID + "', allowed = " + allowed + ", lastConnection = '" + new Date() + "'" + " where name = '" + name + "'";
         try {
             stmt.executeUpdate(sqlName);
         } catch (SQLException e) {
             LogHandler.handleError(e);
         }
-        String sqlPhoneID = "update Clients set name = '" + name + "', threadID = '" + threadID + "', allowed = " + allowed + " where phoneID = '" + phoneID + "'";
+        String sqlPhoneID = "update Clients set name = '" + name + "', threadID = '" + threadID + "', allowed = " + allowed + ", lastConnection = '" + new Date() + "'" + " where phoneID = '" + phoneID + "'";
         try {
             stmt.executeUpdate(sqlPhoneID);
         } catch (SQLException e) {
@@ -146,6 +145,38 @@ public class DBHandler {
 
     public String selectThreadIDByName(String name) {
         String sql = "select threadID from Clients where name = '" + name + "'";
+        try {
+            ResultSet rs = stmt.executeQuery(sql);
+            rs.next();
+            String result = rs.getString(1);
+            rs.close();
+
+            return result;
+
+        } catch (SQLException e) {
+            LogHandler.handleError(e);
+            return "";
+        }
+    }
+
+    public String selectNameByThreadID(String threadID) {
+        String sql = "select name from Clients where threadID = '" + threadID + "'";
+        try {
+            ResultSet rs = stmt.executeQuery(sql);
+            rs.next();
+            String result = rs.getString(1);
+            rs.close();
+
+            return result;
+
+        } catch (SQLException e) {
+            LogHandler.handleError(e);
+            return "";
+        }
+    }
+
+    public String selectLastConnectionByThreadID(String threadID) {
+        String sql = "select lastConnection from Clients where threadID = '" + threadID + "'";
         try {
             ResultSet rs = stmt.executeQuery(sql);
             rs.next();

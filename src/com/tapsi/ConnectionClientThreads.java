@@ -7,8 +7,6 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Date;
 
-// Todo: Add send status door signal after successful connection to the server
-
 public class ConnectionClientThreads implements Runnable {
 
     private String clientID = null;
@@ -24,6 +22,10 @@ public class ConnectionClientThreads implements Runnable {
     public interface ClientListener {
         public void onClientClosed(String id);
         public void onMessage (String clientID, String msg);
+    }
+
+    public String getClientID() {
+        return clientID;
     }
 
     // Implement Listener to send messages to the server thread

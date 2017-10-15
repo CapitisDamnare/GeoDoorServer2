@@ -3,6 +3,7 @@ package com.tapsi;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Date;
 
 public class GeoDoorServer2 {
     
@@ -33,9 +34,6 @@ public class GeoDoorServer2 {
     }
 
     // Todo: add console command to list and give permission to user
-    // Todo: add command to check connected users
-    // Todo: add command to set debug mode on or off
-    // Todo: add command to check message queue
     // Console Commands
     private static void checkCommand(String command) throws GeoDoorExceptions{
         switch (command) {
@@ -70,6 +68,35 @@ public class GeoDoorServer2 {
             case "knx off":
                 serverThread.stopKNXHandler();
                 break;
+            case "set door open":
+                serverThread.setDoorStatus(true);
+                break;
+            case "set door closed":
+                serverThread.setDoorStatus(false);
+                break;
+            case "message queue":
+                System.out.println(new Date() + ": Message queue Size: " + serverThread.getMessageQueueSize());
+                break;
+            case "connected users":
+                System.out.println(new Date() + ": Connected users:\n");
+                serverThread.getUsers();
+                break;
+            case "help":
+                System.out.println("quit                - disables the server and ends the program");
+                System.out.println("show                - show visualisation");
+                System.out.println("hide                - hide visualisation");
+                System.out.println("start               - starts the server");
+                System.out.println("debug on            - enables error debug messages");
+                System.out.println("debug off           - disable error debug messages");
+                System.out.println("knx on              - enables knx thread (door status)");
+                System.out.println("knx off             - disable knx thread (door status)");
+                System.out.println("set door open       - set door to open state");
+                System.out.println("set door closed     - set door to closed state");
+                System.out.println("message queue       - gets the current message queue size");
+                System.out.println("connected users     - shows a list of the current connected users");
+                break;
+
+                // Test commands delete later
             case "knx get":
                 serverThread.getKNXItem();
                 break;

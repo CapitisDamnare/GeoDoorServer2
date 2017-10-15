@@ -13,9 +13,10 @@ import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
-// Todo: Create a command to set open or close state from gate
-
 public class KNXHandler {
+
+    public Thread autoModeThread = null;
+    public AutoModeTimer autoModeTimer = null;
 
     public Timer timer = null;
     public TimerTask timerTask = null;
@@ -33,6 +34,7 @@ public class KNXHandler {
 
     public interface KNXListener {
         public void onDoorStatChanged(int value);
+        public void onAutomaticDoorClose();
     }
 
     public void setCustomListener(KNXListener listener) {
@@ -41,6 +43,17 @@ public class KNXHandler {
 
     public KNXHandler() {
         startTimer();
+    }
+
+    public void getDoorStatus() {
+        listener.onDoorStatChanged(doorStatus);
+    }
+
+    public void setOpenDoorStatus(boolean value) {
+        if (value)
+            doorStatus = 4;
+        else
+            doorStatus = 0;
     }
 
     public void setItem(String item, String parameter) throws IOException {
@@ -71,7 +84,7 @@ public class KNXHandler {
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
         String inputLine;
-        StringBuffer response = new StringBuffer();
+        StringBuilder response = new StringBuilder();
 
         while ((inputLine = in.readLine()) != null) {
             response.append(inputLine);
@@ -79,7 +92,7 @@ public class KNXHandler {
         in.close();
 
         //print result
-        System.out.println(new Date() + ": knx response: " +response.toString());
+        System.out.println(new Date() + ": knx response code: " +String.valueOf(responseCode));
     }
 
     public String getItem(String item) {
@@ -137,6 +150,12 @@ public class KNXHandler {
         timerTask = new RepeatTimer();
         timer = new Timer(true);
         timer.schedule(timerTask,0,200);
+    }
+
+    public void startAutoModeTimer () {
+        autoModeTimer = new AutoModeTimer();
+        autoModeThread = new Thread(autoModeTimer);
+        autoModeThread.start();
     }
 
     public class RepeatTimer extends TimerTask {
@@ -200,19 +219,13 @@ public class KNXHandler {
             }
             else
                 highFlag = true;
-
-//            System.out.println("started timer @:" + new Date());
-//            try {
-//                Thread.sleep(5000);
-//            } catch (InterruptedException e) {
-//                LogHandler.handleError(e);
-//            }
-//            System.out.println("ended timer @:" + new Date());
         }
     }
 
+    // Counter to send the open or close door signal
     public class DoorTimer implements Runnable {
 
+        boolean autoMode = false;
         int counter = 76;
 
         public void setCounter(int counter) {
@@ -242,6 +255,29 @@ public class KNXHandler {
                 doorStatus = 0;
                 listener.onDoorStatChanged(0);
             }
+        }
+    }
+
+    public class AutoModeTimer implements Runnable {
+
+        int counter = 180;
+
+        public void setCounter(int counter) {
+            this.counter = counter;
+        }
+
+        @Override
+        public void run() {
+            while (counter > 0) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    LogHandler.handleError(e);
+                }
+                counter--;
+            }
+            if (counter != -99)
+                listener.onAutomaticDoorClose();
         }
     }
 }
