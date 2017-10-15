@@ -196,8 +196,17 @@ public class ServerThread implements Runnable {
 
     // send a message to e specific client
     public void sendMessageToDevice(String threadID, String msg) {
-        ConnectionClientThreads currentUser = clientMap.get(threadID);
-        currentUser.sendMessage(msg);
+        if (clientMap.containsKey(threadID)) {
+            ConnectionClientThreads currentUser = clientMap.get(threadID);
+            currentUser.sendMessage(msg);
+        }
+        else {
+            try {
+                throw new GeoDoorExceptions("null - key doesn't exist anymore");
+            } catch (GeoDoorExceptions geoDoorExceptions) {
+                geoDoorExceptions.printStackTrace();
+            }
+        }
     }
 
     public void broadcastMessage () {
