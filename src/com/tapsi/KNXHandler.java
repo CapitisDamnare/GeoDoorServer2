@@ -15,6 +15,8 @@ import java.util.TimerTask;
 
 public class KNXHandler {
 
+    private String address = "http://192.168.1.114:8080";
+
     public Thread autoModeThread = null;
     public AutoModeTimer autoModeTimer = null;
 
@@ -57,7 +59,7 @@ public class KNXHandler {
     }
 
     public void setItem(String item, String parameter) throws IOException {
-        String url = "http://192.168.1.112:8080/rest/items/" + item;
+        String url = address + "/rest/items/" + item;
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
@@ -96,7 +98,7 @@ public class KNXHandler {
     }
 
     public String getItem(String item) {
-        String url = "http://192.168.1.112:8080/rest/items/" + item + "/state";
+        String url = address + "/rest/items/" + item + "/state";
         String value = "";
 
         URL obj = null;
