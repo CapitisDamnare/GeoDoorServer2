@@ -3,11 +3,10 @@ package com.tapsi;
 import java.io.IOException;
 
 public class InterfaceToVisu {
-    //private static Visualization visu = null;
+    private static Visualization visu = null;
     
     InterfaceToVisu() {
-        //visu = new Visualization(this);
-        //visu.setVisible(true);
+        //visu = new Visualization();
     }
     
     public void startPressed() {
