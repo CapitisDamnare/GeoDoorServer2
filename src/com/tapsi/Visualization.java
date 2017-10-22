@@ -4,8 +4,10 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.util.concurrent.CountDownLatch;
@@ -14,6 +16,8 @@ public class Visualization extends Application {
     public static final CountDownLatch latch = new CountDownLatch(1);
     public static Visualization startUpTest = null;
     public Stage globalStage;
+
+    Button btn_test;
 
     public static Visualization waitForStartUpTest() {
         try {
@@ -41,12 +45,16 @@ public class Visualization extends Application {
     public void start(Stage stage) throws Exception {
         Platform.setImplicitExit(false);
         globalStage = stage;
-        BorderPane pane = new BorderPane();
-        Scene scene = new Scene(pane, 500, 500);
-        stage.setScene(scene);
 
-        Label label = new Label("Hello");
-        pane.setCenter(label);
+        stage.setTitle("GeoDoorServer");
+        btn_test = new Button();
+        btn_test.setText("My Button");
+
+        StackPane layout = new StackPane();
+        layout.getChildren().add(btn_test);
+
+        Scene scene = new Scene(layout, 300, 300);
+        stage.setScene(scene);
 
         stage.show();
 
