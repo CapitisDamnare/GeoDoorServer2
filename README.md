@@ -18,3 +18,6 @@ Die User Daten werden in einer SQL Lite Datenbank gespeichert
 ## Master Branch
 Derzeit wurde eine eine Verbindung mit dem OpenHAB System hergestellt, welches sich im KNX EIB Netz befindet.
 Das Programm besitzt im Moment eine rudimentäre Konsole welche es erlaubt Nutzer anzuzeigen sowie frei zu schalten.
+
+## Status
+In Kürze wird es hier eine kompilierte Beta Version des Programms geben, welche einfach auf einem Raspbery PI gestartet werden kann.
