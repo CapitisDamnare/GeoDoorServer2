@@ -109,19 +109,21 @@ public class MessageHandlerThread implements Runnable {
             if (checkAllowed) {
                 switch (msg) {
                     case "Gate1 open":
-                        try {
-                            knxHandler.setItem("eg_tor","ON");
-                        } catch (IOException e) {
-                           LogHandler.handleError(e);
-                        }
+                        System.out.println(new Date() + "Gate1 open");
+//                        try {
+//                            knxHandler.setItem("eg_tor","ON");
+//                        } catch (IOException e) {
+//                           LogHandler.handleError(e);
+//                        }
                         break;
                     case "Gate1 open auto":
-                        try {
-                            knxHandler.setItem("eg_tor","ON");
-                            knxHandler.startAutoModeTimer();
-                        } catch (IOException e) {
-                            LogHandler.handleError(e);
-                        }
+                        System.out.println(new Date() + "Gate1 open auto");
+//                        try {
+//                            knxHandler.setItem("eg_tor","ON");
+//                            knxHandler.startAutoModeTimer();
+//                        } catch (IOException e) {
+//                            LogHandler.handleError(e);
+//                        }
                         break;
                     case "Door1 open":
                         try {
