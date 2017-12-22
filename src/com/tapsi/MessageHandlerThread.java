@@ -66,7 +66,7 @@ public class MessageHandlerThread implements Runnable {
                                 break;
                             case "output":
                                 System.out.println(new Date() + ": Took message: " + original);
-                                commandOutput(message);
+                                //commandOutput(message);
                                 break;
                             case "pong":
                                 //System.out.println(new Date() + ": Took message: " + original);

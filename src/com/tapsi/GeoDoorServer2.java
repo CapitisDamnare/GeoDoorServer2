@@ -23,6 +23,7 @@ public class GeoDoorServer2 {
             }
         }.start();
         visu = Visualization.waitForStartUpTest();
+        initVisuListener(visu);
         visu.printSomething();
 
         // Create instance of the server
@@ -121,6 +122,15 @@ public class GeoDoorServer2 {
             default:
                 throw new GeoDoorExceptions("Command not found");
         }
+    }
+
+    static void initVisuListener (Visualization visu) {
+        visu.setCustomListener(new Visualization.VisListener() {
+            @Override
+            public void onStart() {
+                System.out.println("got onStart!");
+            }
+        });
     }
 
     static void startServer() throws InterruptedException, IOException {
