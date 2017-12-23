@@ -11,6 +11,9 @@ import java.util.concurrent.TimeUnit;
 
 public class ServerThread implements Runnable {
 
+    // Gate Status
+    private String gateStatus = "answer:door1 closed";
+
     // Message Handler for incoming messages
     private MessageHandlerThread msgHandler = null;
     private Thread tHandlerThread = null;
@@ -35,10 +38,6 @@ public class ServerThread implements Runnable {
     // boolean to close the Thread
     private boolean close = true;
 
-    // PingTimer for periddic connection checks
-    public Timer timer = null;
-    public PingTimer pingTimerTask = null;
-
     public ServerThread() throws IOException {
         // Create or open DB
         dbHandler = new DBHandler();
@@ -56,7 +55,7 @@ public class ServerThread implements Runnable {
         tHandlerThread.start();
 
         // Start the PingTimer Thread
-        startPingTimer();
+        //startPingTimer();
 
         // Start the Server
         serverSocket = new ServerSocket(1234);
@@ -111,7 +110,11 @@ public class ServerThread implements Runnable {
                     clientMap.remove(oldThreadID);
                     System.out.println(new Date() + ": Closed old active connection: " + oldThreadID);
                 }
-                sendMessageToDevice(threadID, message);
+                if (message.equals("Gate1 status")) {
+                    knxHandler.getDoorStatus();
+                    sendMessageToDevice(threadID, gateStatus);
+                } else
+                    sendMessageToDevice(threadID, message);
             }
         });
     }
@@ -122,19 +125,22 @@ public class ServerThread implements Runnable {
             public void onDoorStatChanged(int value) {
                 for (Map.Entry<String, ConnectionClientThreads> entry : clientMap.entrySet()) {
                     ConnectionClientThreads mapClient = entry.getValue();
-                    if(value == 4)
-                        mapClient.sendMessage("answer:door1 open");
+                    if (value == 4)
+                        gateStatus = "answer:door1 open";
+                        //mapClient.sendMessage("answer:door1 open");
                     else if (value == 0)
-                        mapClient.sendMessage("answer:door1 close");
+                        gateStatus = "answer:door1 closed";
+                        //mapClient.sendMessage("answer:door1 closed");
                     else if (value == 2)
-                        mapClient.sendMessage("answer:door1 stopped");
+                        gateStatus = "answer:door1 stopped";
+                    //mapClient.sendMessage("answer:door1 stopped");
                 }
             }
 
             @Override
             public void onAutomaticDoorClose() {
                 try {
-                    knxHandler.setItem("eg_tor","ON");
+                    knxHandler.setItem("eg_tor", "ON");
                 } catch (IOException e) {
                     LogHandler.handleError(e);
                 }
@@ -162,17 +168,6 @@ public class ServerThread implements Runnable {
         }
     }
 
-    // Just a small test method.
-    // Todo: Delete if not necessary anymore
-    public void test(String value) {
-        try {
-            knxHandler.setItem("eg_buero",value);
-        } catch (IOException e) {
-            LogHandler.handleError(e);
-        }
-        //dbHandler.insertClient("xxx", "89014103211118510720", "0");
-    }
-
     // Close all clientThreads, Server Thread and MessageHandler Thread
     public void quit() {
         close = false;
@@ -182,7 +177,7 @@ public class ServerThread implements Runnable {
             msgHandler.quit();
             dbHandler.closeDB();
             knxHandler.stopTimer();
-            stopPingTimer();
+            //stopPingTimer();
         } catch (IOException ex) {
             LogHandler.handleError(ex);
         }
@@ -209,8 +204,7 @@ public class ServerThread implements Runnable {
         if (clientMap.containsKey(threadID)) {
             ConnectionClientThreads currentUser = clientMap.get(threadID);
             currentUser.sendMessage(msg);
-        }
-        else {
+        } else {
             try {
                 throw new GeoDoorExceptions("null - key doesn't exist anymore");
             } catch (GeoDoorExceptions geoDoorExceptions) {
@@ -219,7 +213,7 @@ public class ServerThread implements Runnable {
         }
     }
 
-    public void broadcastMessage () {
+    public void broadcastMessage() {
         for (Map.Entry<String, ConnectionClientThreads> entry : clientMap.entrySet()) {
             ConnectionClientThreads mapClient = entry.getValue();
             mapClient.sendMessage("answer:ping");
@@ -235,37 +229,19 @@ public class ServerThread implements Runnable {
         knxHandler.stopTimer();
     }
 
-    public  void getKNXItem() {
+    public void getKNXItem() {
         knxHandler.getItem("eg_tor_stat");
     }
 
-    public void stopPingTimer () {
-        timer.cancel();
-    }
-
-    public  void startPingTimer() {
-        pingTimerTask = new PingTimer();
-        timer = new Timer(true);
-        timer.schedule(pingTimerTask,0,20000);
-    }
-
-    public class PingTimer extends TimerTask {
-
-        @Override
-        public void run() {
-            broadcastMessage();
-        }
-    }
-
-    public void setDoorStatus (boolean value) {
+    public void setDoorStatus(boolean value) {
         knxHandler.setOpenDoorStatus(value);
     }
 
-    public String getMessageQueueSize () {
+    public String getMessageQueueSize() {
         return String.valueOf(msgHandler.getQueueSize());
     }
 
-    public void getUsers () {
+    public void getUsers() {
         for (Map.Entry<String, ConnectionClientThreads> entry : clientMap.entrySet()) {
             ConnectionClientThreads mapClient = entry.getValue();
             String name = dbHandler.selectNameByThreadID(mapClient.getClientID());
@@ -273,5 +249,4 @@ public class ServerThread implements Runnable {
             System.out.println("Name: " + name + " - last connection at: " + lastConnection);
         }
     }
-
 }

@@ -16,18 +16,18 @@ public class GeoDoorServer2 {
 
         LogHandler.setDebugMode(true);
 
-        new Thread() {
-            @Override
-            public void run() {
-                javafx.application.Application.launch(Visualization.class);
-            }
-        }.start();
-        visu = Visualization.waitForStartUpTest();
-        initVisuListener(visu);
-        visu.printSomething();
+//        new Thread() {
+//            @Override
+//            public void run() {
+//                javafx.application.Application.launch(Visualization.class);
+//            }
+//        }.start();
+//        visu = Visualization.waitForStartUpTest();
+//        initVisuListener(visu);
+//        visu.printSomething();
 
         // Create instance of the server
-        inVisu = new InterfaceToVisu();
+        //inVisu = new InterfaceToVisu();
 
         // Console Prompt
         while (!quit) {
@@ -113,12 +113,6 @@ public class GeoDoorServer2 {
             case "knx get":
                 serverThread.getKNXItem();
                 break;
-            case "test1":
-                serverThread.test("ON");
-                break;
-            case "test2":
-                serverThread.test("OFF");
-                break;
             default:
                 throw new GeoDoorExceptions("Command not found");
         }
@@ -148,8 +142,8 @@ public class GeoDoorServer2 {
 
     private static void setQuit(boolean val) {
         try {
-            visu.closeVisualization();
-            inVisu.closeVisualisation();
+            //visu.closeVisualization();
+            //inVisu.closeVisualisation();
             stopServer();
         } catch (GeoDoorExceptions ex) {
             LogHandler.handleError(ex);

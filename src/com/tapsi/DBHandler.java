@@ -175,6 +175,22 @@ public class DBHandler {
         }
     }
 
+    public String selectThreadIDByPhoneID(String phoneID) {
+        String sql = "select threadID from Clients where phoneID = '" + phoneID + "'";
+        try {
+            ResultSet rs = stmt.executeQuery(sql);
+            rs.next();
+            String result = rs.getString(1);
+            rs.close();
+
+            return result;
+
+        } catch (SQLException e) {
+            LogHandler.handleError(e);
+            return "";
+        }
+    }
+
     public String selectLastConnectionByThreadID(String threadID) {
         String sql = "select lastConnection from Clients where threadID = '" + threadID + "'";
         try {

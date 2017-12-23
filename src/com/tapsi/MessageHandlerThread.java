@@ -66,7 +66,7 @@ public class MessageHandlerThread implements Runnable {
                                 break;
                             case "output":
                                 System.out.println(new Date() + ": Took message: " + original);
-                                //commandOutput(message);
+                                commandOutput(threadID, message);
                                 break;
                             case "pong":
                                 //System.out.println(new Date() + ": Took message: " + original);
@@ -87,7 +87,6 @@ public class MessageHandlerThread implements Runnable {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
-                System.out.println("here3");
 
                 LogHandler.handleError(e);
                 run();
@@ -95,7 +94,8 @@ public class MessageHandlerThread implements Runnable {
         }
     }
 
-    void commandOutput(String message) {
+    // TODO: Uncomment for Release Version
+    void commandOutput(String threadID, String message) {
         String messageTemp = message;
         String msg = messageTemp.substring(0, messageTemp.indexOf("-"));
         messageTemp = messageTemp.replace(msg + "-", "");
@@ -105,11 +105,13 @@ public class MessageHandlerThread implements Runnable {
         boolean checkPhoneID = dbHandler.checkClientByPhoneID(phoneId);
         boolean checkAllowed = dbHandler.checkAllowedByPhoneID(phoneId);
 
+        String oldThreadID = dbHandler.selectThreadIDByPhoneID(phoneId);
+
         if (checkPhoneID)
             if (checkAllowed) {
                 switch (msg) {
                     case "Gate1 open":
-                        System.out.println(new Date() + "Gate1 open");
+                        listener.onClientAnswer(oldThreadID, threadID, "answer:got Message");
 //                        try {
 //                            knxHandler.setItem("eg_tor","ON");
 //                        } catch (IOException e) {
@@ -117,7 +119,7 @@ public class MessageHandlerThread implements Runnable {
 //                        }
                         break;
                     case "Gate1 open auto":
-                        System.out.println(new Date() + "Gate1 open auto");
+                        listener.onClientAnswer(oldThreadID, threadID, "answer:got Message");
 //                        try {
 //                            knxHandler.setItem("eg_tor","ON");
 //                            knxHandler.startAutoModeTimer();
@@ -126,11 +128,15 @@ public class MessageHandlerThread implements Runnable {
 //                        }
                         break;
                     case "Door1 open":
-                        try {
-                            knxHandler.setItem("eg_tuer","ON");
-                        } catch (IOException e) {
-                            LogHandler.handleError(e);
-                        }
+                        listener.onClientAnswer(oldThreadID, threadID, "answer:got Message");
+//                        try {
+//                            knxHandler.setItem("eg_tuer","ON");
+//                        } catch (IOException e) {
+//                            LogHandler.handleError(e);
+//                        }
+                        break;
+                    case "Gate1 status":
+                        listener.onClientAnswer(oldThreadID, threadID, "Gate1 status");
                         break;
                     default:
                         try {
