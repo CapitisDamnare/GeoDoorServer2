@@ -1,6 +1,5 @@
 package com.tapsi;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -16,6 +15,12 @@ public class MessageHandlerThread implements Runnable {
 
     public interface messageListener {
         public void onClientAnswer(String oldThreadID, String threadID, String message);
+
+        public void onVisuAnswer(String oldThreadID, String threadID, String message);
+
+        public void onSendAllClients(String oldThreadID, String threadID, String message);
+
+        public void onSafeClient(String oldThreadID, String threadID, String message);
     }
 
     public void setCustomListener(messageListener listener) {
@@ -44,16 +49,19 @@ public class MessageHandlerThread implements Runnable {
     // Check permanently the queue for new messages to handle
     @Override
     public void run() {
-        System.out.println("MessagHandlerThread started ...");
+        System.out.println(new Date() + ": MessagHandlerThread started ...");
         while (close) {
             if (queue.size() > 0) {
                 try {
                     String message = queue.take();
                     String original = message;
 
+                    String port = null;
                     String threadID = null;
                     String command = null;
                     if (message.contains("#")) {
+                        port = message.substring(0, message.indexOf("#"));
+                        message = message.replace(port + "#", "");
                         threadID = message.substring(0, message.indexOf("#"));
                         message = message.replace(threadID + "#", "");
                         command = message.substring(0, message.indexOf(":"));
@@ -62,17 +70,24 @@ public class MessageHandlerThread implements Runnable {
                         switch (command) {
                             case "register":
                                 System.out.println(new Date() + ": Took message: " + original);
-                                commandRegister(threadID, message);
+                                commandRegister(threadID, message, port);
+                                break;
+                            case "visuRegister":
+                                System.out.println(new Date() + ": Took message: " + original);
+                                commandVisuRegister(threadID, message, port);
                                 break;
                             case "output":
                                 System.out.println(new Date() + ": Took message: " + original);
-                                commandOutput(threadID, message);
+                                commandOutput(threadID, message, port);
                                 break;
+                            case "server":
+                                System.out.println(new Date() + ": Took server message: " + original);
+                                commandVisuServer(threadID, message, port);
                             case "pong":
                                 //System.out.println(new Date() + ": Took message: " + original);
                                 break;
                             default:
-                                throw new GeoDoorExceptions("Sent socket command doesn't exist");
+                                throw new GeoDoorExceptions("Sent socket command doesn't exist: " + original);
                         }
                     } else
                         throw new GeoDoorExceptions("No identifier found!");
@@ -95,7 +110,7 @@ public class MessageHandlerThread implements Runnable {
     }
 
     // TODO: Uncomment for Release Version
-    void commandOutput(String threadID, String message) {
+    private void commandOutput(String threadID, String message, String port) {
         String messageTemp = message;
         String msg = messageTemp.substring(0, messageTemp.indexOf("-"));
         messageTemp = messageTemp.replace(msg + "-", "");
@@ -107,6 +122,7 @@ public class MessageHandlerThread implements Runnable {
 
         String oldThreadID = dbHandler.selectThreadIDByPhoneID(phoneId);
 
+        if (phoneId.equals("13579") || port.equals(Integer.toString(VisuServerThread.getPORT())))
         if (checkPhoneID)
             if (checkAllowed) {
                 switch (msg) {
@@ -148,7 +164,7 @@ public class MessageHandlerThread implements Runnable {
             }
     }
 
-    void commandRegister(String threadID, String message) {
+    private void commandRegister(String threadID, String message, String port) {
 
         String messageTemp = message;
         String name = messageTemp.substring(0, messageTemp.indexOf("-"));
@@ -161,19 +177,70 @@ public class MessageHandlerThread implements Runnable {
 
         String oldThreadID = dbHandler.selectThreadIDByName(name);
 
+        if (phoneId.equals("13579") || port.equals(Integer.toString(VisuServerThread.getPORT())))
+            return;
         if (checkPhoneID) {
             if (!checkAllowed) {
                 listener.onClientAnswer(oldThreadID, threadID, "answer:not yet allowed");
-            }
-            else {
-                listener.onClientAnswer(oldThreadID, threadID,  "answer:allowed");
-                knxHandler.getDoorStatus();
+            } else {
+                listener.onClientAnswer(oldThreadID, threadID, "answer:allowed");
+                //knxHandler.getDoorStatus();
             }
         } else {
             listener.onClientAnswer(oldThreadID, threadID, "answer:registered ... waiting for permission");
         }
         // Will automatically insert or update
         dbHandler.insertClient(name, phoneId, threadID);
+    }
+
+    private void commandVisuRegister(String threadID, String message, String port) {
+
+        String messageTemp = message;
+        String name = messageTemp.substring(0, messageTemp.indexOf("-"));
+        messageTemp = messageTemp.replace(name + "-", "");
+
+        String phoneId = messageTemp;
+
+        boolean checkPhoneID = dbHandler.checkClientByPhoneID(phoneId);
+        boolean checkAllowed = dbHandler.checkAllowedByPhoneID(phoneId);
+
+        String oldThreadID = dbHandler.selectThreadIDByName(name);
+
+        if (phoneId.equals("13579") && port.equals(Integer.toString(VisuServerThread.getPORT()))) {
+            if (checkPhoneID) {
+                if (!checkAllowed) {
+                    listener.onVisuAnswer(oldThreadID, threadID, "answer:not yet allowed");
+                } else {
+                    listener.onVisuAnswer(oldThreadID, threadID, "answer:allowed");
+                }
+            } else {
+                listener.onVisuAnswer(oldThreadID, threadID, "answer:registered ... waiting for permission");
+            }
+        }
+        // Will automatically insert or update
+        dbHandler.insertClient(name, phoneId, threadID);
+    }
+
+    private void commandVisuServer(String threadID, String message, String port) {
+
+        String messageTemp = message;
+        String name = messageTemp.substring(0, messageTemp.indexOf("-"));
+        messageTemp = messageTemp.replace(name + "-", "");
+
+        String phoneId = messageTemp;
+
+        boolean checkPhoneID = dbHandler.checkClientByPhoneID(phoneId);
+        boolean checkAllowed = dbHandler.checkAllowedByPhoneID(phoneId);
+
+        String oldThreadID = dbHandler.selectThreadIDByName(name);
+
+        if (phoneId.equals("13579") && port.equals(Integer.toString(VisuServerThread.getPORT()))) {
+            if (checkPhoneID) {
+                if (checkAllowed) {
+                    listener.onSendAllClients(oldThreadID, threadID, "answer:ok");
+                }
+            }
+        }
     }
 
     // Close the thread

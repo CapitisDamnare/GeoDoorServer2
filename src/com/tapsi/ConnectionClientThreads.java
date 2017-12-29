@@ -1,9 +1,6 @@
 package com.tapsi;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.Date;
 
@@ -21,14 +18,14 @@ public class ConnectionClientThreads implements Runnable {
 
     public interface ClientListener {
         public void onClientClosed(String id);
-        public void onMessage (String clientID, String msg);
+
+        public void onMessage(String clientID, String msg);
     }
 
     public String getClientID() {
         return clientID;
     }
 
-    // Implement Listener to send messages to the server thread
     public ConnectionClientThreads(Socket socket, String clientID) {
         this.socket = socket;
         this.clientID = clientID;
@@ -57,8 +54,7 @@ public class ConnectionClientThreads implements Runnable {
 
                 if (line != null) {
                     listener.onMessage(clientID, line);
-                }
-                else
+                } else
                     inputStream.close();
             }
         } catch (IOException ex) {

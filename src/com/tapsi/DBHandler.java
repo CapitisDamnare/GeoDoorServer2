@@ -1,25 +1,38 @@
 package com.tapsi;
 
 
+import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.jdbc.JdbcConnectionSource;
+import com.j256.ormlite.support.ConnectionSource;
+
 import java.sql.*;
 import java.util.Date;
+import java.util.List;
+import java.util.ListIterator;
 
 public class DBHandler {
+
+    private String dbUrl = "jdbc:sqlite:my.db";
     private Connection c = null;
     private Statement stmt = null;
+
+    Dao<Client, String> clientDao;
+    ConnectionSource connectionSource;
+
 
     DBHandler() {
 
         // Connect to database or create if no existent
         try {
             Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection("jdbc:sqlite:my.db");
+            c = DriverManager.getConnection(dbUrl);
         } catch (ClassNotFoundException e) {
             LogHandler.handleError(e);
         } catch (SQLException e) {
             LogHandler.handleError(e);
         }
-        System.out.println("Connected to DB!");
+        System.out.println(new Date() + ": Connected to DB!");
 
         // Create table if not existent
         try {
@@ -30,6 +43,13 @@ public class DBHandler {
             stmt.executeUpdate(sql);
         } catch (SQLException e) {
             LogHandler.handleError(e);
+        }
+
+        try {
+            connectionSource = new JdbcConnectionSource(dbUrl);
+            clientDao = DaoManager.createDao(connectionSource, Client.class);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -204,6 +224,22 @@ public class DBHandler {
         } catch (SQLException e) {
             LogHandler.handleError(e);
             return "";
+        }
+    }
+
+    public List<Client> readAllObjects() {
+        try {
+            List<Client> clients = clientDao.queryForAll();
+
+            ListIterator iterator = clients.listIterator();
+            while (iterator.hasNext()) {
+                Client client = (Client) iterator.next();
+                client.printData();
+            }
+            return clients;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 

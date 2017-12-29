@@ -9,7 +9,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class ServerThread implements Runnable {
+public final class ServerThread implements Runnable {
+
+    private static final int PORT = 1234;
 
     // Gate Status
     private String gateStatus = "answer:door1 closed";
@@ -23,6 +25,10 @@ public class ServerThread implements Runnable {
 
     // KNXHandler to connect to the OpenHAB API
     KNXHandler knxHandler = null;
+
+    // Start the Visu Server Thread for all Visu Connections
+    private VisuServerThread visuServerThread = null;
+    private Thread tVisuServerThread = null;
 
     // Client ExecutorService for the client threads
     private final ExecutorService pool;
@@ -54,13 +60,19 @@ public class ServerThread implements Runnable {
         tHandlerThread = new Thread(msgHandler);
         tHandlerThread.start();
 
-        // Start the PingTimer Thread
-        //startPingTimer();
+        // Start the VisuServer
+        visuServerThread = new VisuServerThread(dbHandler, msgHandler);
+        tVisuServerThread = new Thread(visuServerThread);
+        tVisuServerThread.start();
 
         // Start the Server
-        serverSocket = new ServerSocket(1234);
+        serverSocket = new ServerSocket(PORT);
         pool = Executors.newFixedThreadPool(10);
-        System.out.println("Server started...");
+        System.out.println(new Date() + ": Client Server started...");
+    }
+
+    public static int getPORT() {
+        return PORT;
     }
 
     // If a new client connects to the socket a new Thread will be started for the connection
@@ -69,6 +81,7 @@ public class ServerThread implements Runnable {
         while (close) {
             try {
                 socket = serverSocket.accept();
+                socket.setSoTimeout(5000);
                 client = new ConnectionClientThreads(socket, socket.getRemoteSocketAddress().toString());
                 initClientListener(client);
                 pool.execute(client);
@@ -79,7 +92,7 @@ public class ServerThread implements Runnable {
                 LogHandler.handleError(ex);
             }
         }
-        System.out.println("Server stopped");
+        System.out.println(new Date() + ": Server stopped");
         shutdownAndAwaitTermination(pool);
     }
 
@@ -93,7 +106,7 @@ public class ServerThread implements Runnable {
 
             @Override
             public void onMessage(String clientID, String msg) {
-                msgHandler.putMessage(clientID + "#" + msg);
+                msgHandler.putMessage(PORT + "#" + clientID + "#" + msg);
             }
         });
     }
@@ -115,6 +128,21 @@ public class ServerThread implements Runnable {
                     sendMessageToDevice(threadID, gateStatus);
                 } else
                     sendMessageToDevice(threadID, message);
+            }
+
+            @Override
+            public void onVisuAnswer(String oldThreadID, String threadID, String message) {
+                visuServerThread.sendVisuMessageToDevice(oldThreadID, threadID, message);
+            }
+
+            @Override
+            public void onSendAllClients(String oldThreadID, String threadID, String message) {
+                visuServerThread.sendVisuObjectToDevice(oldThreadID, threadID, message);
+            }
+
+            @Override
+            public void onSafeClient(String oldThreadID, String threadID, String message) {
+                visuServerThread.safeClient();
             }
         });
     }
@@ -156,7 +184,7 @@ public class ServerThread implements Runnable {
                 pool.shutdownNow(); // Cancel currently executing tasks
                 // Wait a while for tasks to respond to being cancelled
                 if (!pool.awaitTermination(10, TimeUnit.SECONDS)) {
-                    System.out.println("Pool did not terminate");
+                    System.out.println(new Date() + ": Pool did not terminate");
                 }
             }
         } catch (InterruptedException ex) {
@@ -177,6 +205,7 @@ public class ServerThread implements Runnable {
             msgHandler.quit();
             dbHandler.closeDB();
             knxHandler.stopTimer();
+            visuServerThread.closeVisuClientThreads();
             //stopPingTimer();
         } catch (IOException ex) {
             LogHandler.handleError(ex);
@@ -201,6 +230,7 @@ public class ServerThread implements Runnable {
 
     // send a message to e specific client
     public void sendMessageToDevice(String threadID, String msg) {
+        System.out.println(new Date() + ": Sending Message '" + msg + "' to device -> " + threadID);
         if (clientMap.containsKey(threadID)) {
             ConnectionClientThreads currentUser = clientMap.get(threadID);
             currentUser.sendMessage(msg);
