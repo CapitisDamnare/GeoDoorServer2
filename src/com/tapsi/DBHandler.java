@@ -234,7 +234,6 @@ public class DBHandler {
             ListIterator iterator = clients.listIterator();
             while (iterator.hasNext()) {
                 Client client = (Client) iterator.next();
-                client.printData();
             }
             return clients;
         } catch (SQLException e) {

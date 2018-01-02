@@ -77,7 +77,6 @@ public class MessageHandlerThread implements Runnable {
                                 commandVisuRegister(threadID, message, port);
                                 break;
                             case "output":
-                                System.out.println(new Date() + ": Took message: " + original);
                                 commandOutput(threadID, message, port);
                                 break;
                             case "server":
@@ -127,6 +126,7 @@ public class MessageHandlerThread implements Runnable {
             if (checkAllowed) {
                 switch (msg) {
                     case "Gate1 open":
+                        System.out.println(new Date() + ": Took message: " + message);
                         listener.onClientAnswer(oldThreadID, threadID, "answer:got Message");
 //                        try {
 //                            knxHandler.setItem("eg_tor","ON");
@@ -135,6 +135,7 @@ public class MessageHandlerThread implements Runnable {
 //                        }
                         break;
                     case "Gate1 open auto":
+                        System.out.println(new Date() + ": Took message: " + message);
                         listener.onClientAnswer(oldThreadID, threadID, "answer:got Message");
 //                        try {
 //                            knxHandler.setItem("eg_tor","ON");
@@ -144,6 +145,7 @@ public class MessageHandlerThread implements Runnable {
 //                        }
                         break;
                     case "Door1 open":
+                        System.out.println(new Date() + ": Took message: " + message);
                         listener.onClientAnswer(oldThreadID, threadID, "answer:got Message");
 //                        try {
 //                            knxHandler.setItem("eg_tuer","ON");
