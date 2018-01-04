@@ -116,7 +116,6 @@ public class VisuClientThread implements Runnable {
 
     public void sendObject(Pair<String,List<List<String>>> msg) {
         try {
-            System.out.println("jup!!!!");
             objectOutputStream.writeObject(msg);
         } catch (IOException ex) {
             LogHandler.handleError(ex);
