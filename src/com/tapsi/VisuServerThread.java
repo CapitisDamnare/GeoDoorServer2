@@ -7,6 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -50,6 +51,25 @@ public class VisuServerThread implements Runnable {
         // Start the Server
         visuServerSocket = new ServerSocket(PORT);
         visuPool = Executors.newFixedThreadPool(10);
+        new XMLWriter();
+        List<Client> clients = dbHandler.readAllObjects();
+        if (clients != null) {
+            VisuSocketObject visuSocketObject = new VisuSocketObject(clients,"whatever");
+        } else {
+            VisuSocketObject visuSocketObject = new VisuSocketObject("no Clients");
+        }
+        try {
+            XMLWriter.saveConfig();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println(XMLWriter.getXml());
+        List<Client> clients1 = XMLReader.readConfig(XMLWriter.getXml());
+
+        VisuSocketObject visuSocketObject = new VisuSocketObject(clients1,"new");
+        visuSocketObject.printAll();
+
+
         System.out.println(new Date() + ": Visu Server started...");
     }
 

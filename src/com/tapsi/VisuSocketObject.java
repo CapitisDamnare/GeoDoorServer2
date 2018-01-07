@@ -8,8 +8,9 @@ import java.util.ListIterator;
 
 public class VisuSocketObject {
 
-    private List<Client> clients = null;
+    private static List<Client> clients = null;
     private String message = null;
+
 
     public VisuSocketObject(List<Client> clients) {
         this.clients = clients;
@@ -35,7 +36,7 @@ public class VisuSocketObject {
        }
     }
 
-    public List<Client> getClients() {
+    public static List<Client> getClients() {
         return clients;
     }
 
