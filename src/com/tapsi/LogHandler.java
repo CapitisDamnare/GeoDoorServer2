@@ -33,7 +33,7 @@ public class LogHandler {
     public static void handleError(IOException ex) {
         if (debugMode) {
             //System.err.println(new Date() + ": got Exception:");
-            ex.printStackTrace();
+            //ex.printStackTrace();
         }
     }
 

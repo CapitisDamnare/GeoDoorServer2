@@ -56,16 +56,8 @@ public class VisuSocketObject {
         clients.add(client);
     }
 
-    public Pair<String,List<List<String>>> getContainer () {
-        List<List<String>> clients = new ArrayList<>();
-        if (this.clients != null){
-            ListIterator<Client> iterator = this.clients.listIterator();
-            while (iterator.hasNext()) {
-                clients.add(iterator.next().getData());
-            }
-        }
-
-        return new Pair<>(this.message, clients);
+    public Pair<String,String> getContainer () {
+        return new Pair<>(this.message, XMLWriter.getXml());
     }
 
     public void printAll() {

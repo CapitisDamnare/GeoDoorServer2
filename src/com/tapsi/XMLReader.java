@@ -61,6 +61,15 @@ public class XMLReader {
 
                     if (event.isStartElement()) {
                         if (event.asStartElement().getName().getLocalPart()
+                                .equals(ID)) {
+                            event = eventReader.nextEvent();
+                            client.setId(Integer.valueOf(event.asCharacters().getData()));
+                            continue;
+                        }
+                    }
+
+                    if (event.isStartElement()) {
+                        if (event.asStartElement().getName().getLocalPart()
                                 .equals(NAME)) {
                             event = eventReader.nextEvent();
                             client.setName(event.asCharacters().getData());

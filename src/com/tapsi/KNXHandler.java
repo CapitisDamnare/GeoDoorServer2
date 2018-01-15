@@ -44,7 +44,7 @@ public class KNXHandler {
     }
 
     public KNXHandler() {
-        startTimer();
+        //startTimer();
     }
 
     public void getDoorStatus() {

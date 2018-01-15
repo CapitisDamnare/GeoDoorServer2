@@ -63,14 +63,14 @@ public class VisuServerThread implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(XMLWriter.getXml());
-        List<Client> clients1 = XMLReader.readConfig(XMLWriter.getXml());
+        //System.out.println(XMLWriter.getXml());
+        //List<Client> clients1 = XMLReader.readConfig(XMLWriter.getXml());
 
-        VisuSocketObject visuSocketObject = new VisuSocketObject(clients1,"new");
-        visuSocketObject.printAll();
+        //VisuSocketObject visuSocketObject = new VisuSocketObject(clients1,"new");
+        //visuSocketObject.printAll();
 
 
-        System.out.println(new Date() + ": Visu Server started...");
+        //System.out.println(new Date() + ": Visu Server started...");
     }
 
     public static int getPORT() {
@@ -107,7 +107,7 @@ public class VisuServerThread implements Runnable {
             }
 
             @Override
-            public void onVisuMessage(String clientID, Pair<String,List<String>> msg) {
+            public void onVisuMessage(String clientID, Pair<String,String> msg) {
                 msgHandler.putMessage( PORT + "#" + clientID + "#" + msg.getKey());
             }
         });
@@ -172,7 +172,7 @@ public class VisuServerThread implements Runnable {
     }
 
     public void sendVisuObjectToDevice(String oldThreadID, String threadID, String msg) {
-        Pair<String,List<List<String>>> socketOutput;
+        Pair<String,String> socketOutput;
         List<Client> clients = dbHandler.readAllObjects();
         if (clients != null) {
             VisuSocketObject visuSocketObject = new VisuSocketObject(clients,msg);
@@ -208,7 +208,7 @@ public class VisuServerThread implements Runnable {
     }
 
     // send a message to e specific client
-    private void sendObjectToDevice(String threadID, Pair<String,List<List<String>>> msg) {
+    private void sendObjectToDevice(String threadID, Pair<String,String> msg) {
         System.out.println(new Date() + ": Sending Visu Message '" + msg +"' to device -> " + threadID);
         if (visuClientMap.containsKey(threadID)) {
             VisuClientThread currentUser = visuClientMap.get(threadID);
