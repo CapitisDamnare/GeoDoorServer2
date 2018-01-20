@@ -1,5 +1,6 @@
 package tapsi.com.data;
 
+import tapsi.com.database.DBHandler;
 import tapsi.com.logging.LogHandler;
 import tapsi.com.visuserver.VisuSocketObject;
 
@@ -20,7 +21,19 @@ import javax.xml.stream.events.XMLEvent;
 public class XMLWriter {
     private static String xml;
 
+    // Database Handler to save Names and allowed usage of the KNX Handler
+    static DBHandler  dbHandler = null;
+
+    public XMLWriter(DBHandler dbHandler) {
+        XMLWriter.dbHandler = dbHandler;
+    }
+
     public static String getXml() {
+        try {
+            saveConfig();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return xml;
     }
 
@@ -66,6 +79,7 @@ public class XMLWriter {
         XMLEvent end = eventFactory.createDTD("\n");
         XMLEvent tab = eventFactory.createDTD("\t");
 
+        VisuSocketObject.setClients(dbHandler.readAllObjects());
         List<Client> clients = VisuSocketObject.getClients();
         ListIterator<Client> iterator = clients.listIterator();
         while (iterator.hasNext()) {

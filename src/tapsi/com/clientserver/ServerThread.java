@@ -149,7 +149,7 @@ public final class ServerThread implements Runnable {
 
             @Override
             public void onSafeClient(String oldThreadID, String threadID, String message) {
-                visuServerThread.safeClient();
+                visuServerThread.safeClient(oldThreadID, threadID, message);
             }
         });
     }

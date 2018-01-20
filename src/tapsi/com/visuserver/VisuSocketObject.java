@@ -41,8 +41,8 @@ public class VisuSocketObject {
         return clients;
     }
 
-    public void setClients(List<Client> clients) {
-        this.clients = clients;
+    public static void setClients(List<Client> clients) {
+        VisuSocketObject.clients = clients;
     }
 
     public String getMessage() {

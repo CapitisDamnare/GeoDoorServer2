@@ -23,6 +23,12 @@ public class XMLReader {
     static final String ALLOWED = "allowed";
     static final String LASTCONNECTION = "lastConnection";
 
+    /**
+     * Reads the xml and returns a list of clients with the according data
+     *
+     * @param configFile
+     * @return List<Client>
+     */
     @SuppressWarnings({"unchecked", "null"})
     public static List<Client> readConfig(String configFile) {
         List<Client> clients = new ArrayList<Client>();
@@ -102,7 +108,8 @@ public class XMLReader {
                     if (event.asStartElement().getName().getLocalPart()
                             .equals(LASTCONNECTION)) {
                         event = eventReader.nextEvent();
-                        client.setLastConnection(event.asCharacters().getData());
+                        if (event.isCharacters())
+                            client.setLastConnection(event.asCharacters().getData());
                         continue;
                     }
                 }

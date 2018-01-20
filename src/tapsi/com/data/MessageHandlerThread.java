@@ -90,9 +90,8 @@ public class MessageHandlerThread implements Runnable {
                                 commandVisuServer(threadID, message, port);
                                 break;
                             case "update":
-                                // TODO: Update Handling
-                                System.out.println(new Date() + ": Got update message: " + original);
-                                System.out.println(new Date() +  "Data: " + message);
+                                System.out.println(new Date() + ": Got update message: " );
+                                updateVisuServer(threadID, message, port);
                                 break;
                             case "pong":
                                 //System.out.println(new Date() + ": Took message: " + original);
@@ -240,6 +239,7 @@ public class MessageHandlerThread implements Runnable {
         String messageTemp = message;
         String name = messageTemp.substring(0, messageTemp.indexOf("-"));
         messageTemp = messageTemp.replace(name + "-", "");
+        messageTemp = messageTemp.replace("#", "");
 
         String phoneId = messageTemp;
 
@@ -252,6 +252,31 @@ public class MessageHandlerThread implements Runnable {
             if (checkPhoneID) {
                 if (checkAllowed) {
                     listener.onSendAllClients(oldThreadID, threadID, "answer:ok");
+                }
+            }
+        }
+    }
+
+    private void updateVisuServer(String threadID, String message, String port) {
+
+        String messageTemp = message;
+        String name = messageTemp.substring(0, messageTemp.indexOf("-"));
+        messageTemp = messageTemp.replace(name + "-", "");
+        String phoneId = messageTemp.substring(0, messageTemp.indexOf("#"));
+        messageTemp = messageTemp.replace(phoneId + "#", "");
+
+        String data = messageTemp;
+
+
+        boolean checkPhoneID = dbHandler.checkClientByPhoneID(phoneId);
+        boolean checkAllowed = dbHandler.checkAllowedByPhoneID(phoneId);
+
+        String oldThreadID = dbHandler.selectThreadIDByName(name);
+
+        if (phoneId.equals("13579") && port.equals(Integer.toString(VisuServerThread.getPORT()))) {
+            if (checkPhoneID) {
+                if (checkAllowed) {
+                    listener.onSafeClient(oldThreadID, threadID, data);
                 }
             }
         }

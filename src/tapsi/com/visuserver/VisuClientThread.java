@@ -61,7 +61,7 @@ public class VisuClientThread implements Runnable {
                 listener.onVisuMessage(clientID, socketinputObject);
             }
         } catch (IOException ex) {
-            System.out.println(new Date() + ": VisuClientThread stopped from client -> " + clientID);
+            //System.out.println(new Date() + ": VisuClientThread stopped from client -> " + clientID);
             LogHandler.handleError(ex);
         } catch (ClassNotFoundException ex) {
             LogHandler.handleError(ex);
@@ -76,7 +76,7 @@ public class VisuClientThread implements Runnable {
                 listener.onVisuClientClosed(clientID);
                 socket.close();
             } catch (IOException ex) {
-                System.out.println(new Date() + ": VisuClientThread stopped from client -> " + clientID);
+                //System.out.println(new Date() + ": VisuClientThread stopped from client -> " + clientID);
                 LogHandler.handleError(ex);
             }
         }

@@ -80,6 +80,7 @@ public class ConnectionClientThreads implements Runnable {
 
     }
 
+
     public void closeThread() {
         try {
             sendMessage("quit");

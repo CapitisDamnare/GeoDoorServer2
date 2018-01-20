@@ -4,6 +4,7 @@ package tapsi.com.database;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
+import com.j256.ormlite.logger.LocalLog;
 import com.j256.ormlite.support.ConnectionSource;
 import tapsi.com.data.Client;
 import tapsi.com.logging.GeoDoorExceptions;
@@ -25,6 +26,8 @@ public class DBHandler {
 
 
     public DBHandler() {
+
+        System.setProperty(LocalLog.LOCAL_LOG_LEVEL_PROPERTY,"FATAL");
 
         // Connect to database or create if no existent
         try {
@@ -93,6 +96,21 @@ public class DBHandler {
             LogHandler.handleError(e);
         }
         String sqlPhoneID = "update Clients set name = '" + name + "', threadID = '" + threadID + "', allowed = " + allowed + ", lastConnection = '" + new Date() + "'" + " where phoneID = '" + phoneID + "'";
+        try {
+            stmt.executeUpdate(sqlPhoneID);
+        } catch (SQLException e) {
+            LogHandler.handleError(e);
+        }
+    }
+
+    public void changeClientValues(String name, String phoneID, int allowed) {
+        String sqlName = "update Clients set allowed = '" + allowed + "'" + " where name = '" + name + "'";
+        try {
+            stmt.executeUpdate(sqlName);
+        } catch (SQLException e) {
+            LogHandler.handleError(e);
+        }
+        String sqlPhoneID = "update Clients set name = '" + name + "', allowed = '" + allowed + "'" +" where phoneID = '" + phoneID + "'";
         try {
             stmt.executeUpdate(sqlPhoneID);
         } catch (SQLException e) {

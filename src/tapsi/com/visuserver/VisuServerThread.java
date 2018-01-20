@@ -3,6 +3,7 @@ package tapsi.com.visuserver;
 import javafx.util.Pair;
 import tapsi.com.data.Client;
 import tapsi.com.data.MessageHandlerThread;
+import tapsi.com.data.XMLReader;
 import tapsi.com.data.XMLWriter;
 import tapsi.com.database.DBHandler;
 import tapsi.com.logging.GeoDoorExceptions;
@@ -13,6 +14,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -56,7 +58,7 @@ public class VisuServerThread implements Runnable {
         // Start the Server
         visuServerSocket = new ServerSocket(PORT);
         visuPool = Executors.newFixedThreadPool(10);
-        new XMLWriter();
+        new XMLWriter(dbHandler);
         List<Client> clients = dbHandler.readAllObjects();
         if (clients != null) {
             VisuSocketObject visuSocketObject = new VisuSocketObject(clients,"whatever");
@@ -68,14 +70,8 @@ public class VisuServerThread implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //System.out.println(XMLWriter.getXml());
-        //List<Client> clients1 = XMLReader.readConfig(XMLWriter.getXml());
 
-        //VisuSocketObject visuSocketObject = new VisuSocketObject(clients1,"new");
-        //visuSocketObject.printAll();
-
-
-        //System.out.println(new Date() + ": Visu Server started...");
+        System.out.println(new Date() + ": Visu Server started...");
     }
 
     public static int getPORT() {
@@ -113,7 +109,7 @@ public class VisuServerThread implements Runnable {
 
             @Override
             public void onVisuMessage(String clientID, Pair<String,String> msg) {
-                msgHandler.putMessage( PORT + "#" + clientID + "#" + msg.getKey());
+                msgHandler.putMessage( PORT + "#" + clientID + "#" + msg.getKey() + "#" + msg.getValue());
             }
         });
     }
@@ -214,7 +210,7 @@ public class VisuServerThread implements Runnable {
 
     // send a message to e specific client
     private void sendObjectToDevice(String threadID, Pair<String,String> msg) {
-        System.out.println(new Date() + ": Sending Visu Message '" + msg +"' to device -> " + threadID);
+        System.out.println(new Date() + ": Sending Object Message to device -> " + threadID);
         if (visuClientMap.containsKey(threadID)) {
             VisuClientThread currentUser = visuClientMap.get(threadID);
             currentUser.sendObject(msg);
@@ -240,7 +236,25 @@ public class VisuServerThread implements Runnable {
         }
     }
 
-    public void safeClient() {
+    public void safeClient(String oldThreadID, String threadID, String message) {
+
+        List<Client> clients = XMLReader.readConfig(message);
+
+        ListIterator<Client> listIterator = clients.listIterator();
+
+        while (listIterator.hasNext()) {
+            Client client = listIterator.next();
+            dbHandler.changeClientValues(client.getName(), client.getPhoneID(), client.getAllowed());
+        }
+
+        // old ThreadID ist still active - close and delete it
+        if (visuClientMap.containsKey(oldThreadID)) {
+            VisuClientThread mapClient = visuClientMap.get(oldThreadID);
+            mapClient.closeThread();
+            visuClientMap.remove(oldThreadID);
+            System.out.println(new Date() + ": Closed old active visu connection: " + oldThreadID);
+        } else
+            sendMessageToDevice(threadID, "answer:ok");
 
     }
 }
