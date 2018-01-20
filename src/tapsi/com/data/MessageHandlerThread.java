@@ -1,4 +1,10 @@
-package com.tapsi;
+package tapsi.com.data;
+
+import tapsi.com.database.DBHandler;
+import tapsi.com.knx.KNXHandler;
+import tapsi.com.logging.GeoDoorExceptions;
+import tapsi.com.logging.LogHandler;
+import tapsi.com.visuserver.VisuServerThread;
 
 import java.util.Date;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -82,6 +88,12 @@ public class MessageHandlerThread implements Runnable {
                             case "server":
                                 System.out.println(new Date() + ": Took server message: " + original);
                                 commandVisuServer(threadID, message, port);
+                                break;
+                            case "update":
+                                // TODO: Update Handling
+                                System.out.println(new Date() + ": Got update message: " + original);
+                                System.out.println(new Date() +  "Data: " + message);
+                                break;
                             case "pong":
                                 //System.out.println(new Date() + ": Took message: " + original);
                                 break;

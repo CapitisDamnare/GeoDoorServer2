@@ -1,4 +1,7 @@
-package com.tapsi;
+package tapsi.com.data;
+
+import tapsi.com.logging.LogHandler;
+import tapsi.com.visuserver.VisuSocketObject;
 
 import java.io.StringWriter;
 import java.util.List;

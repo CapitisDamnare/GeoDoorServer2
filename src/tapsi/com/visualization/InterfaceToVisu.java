@@ -1,4 +1,9 @@
-package com.tapsi;
+package tapsi.com.visualization;
+
+import tapsi.com.GeoDoorServer2;
+import tapsi.com.logging.GeoDoorExceptions;
+import tapsi.com.logging.LogHandler;
+import tapsi.com.visualization.Visualization;
 
 import java.io.IOException;
 
@@ -27,7 +32,7 @@ public class InterfaceToVisu {
         }
     }
     
-    void showVisualization(boolean val) {
+    public void showVisualization(boolean val) {
         //visu.showWindow(val);
     }
     

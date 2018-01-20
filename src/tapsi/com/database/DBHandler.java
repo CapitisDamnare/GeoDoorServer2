@@ -1,10 +1,13 @@
-package com.tapsi;
+package tapsi.com.database;
 
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
+import tapsi.com.data.Client;
+import tapsi.com.logging.GeoDoorExceptions;
+import tapsi.com.logging.LogHandler;
 
 import java.sql.*;
 import java.util.Date;
@@ -21,7 +24,7 @@ public class DBHandler {
     ConnectionSource connectionSource;
 
 
-    DBHandler() {
+    public DBHandler() {
 
         // Connect to database or create if no existent
         try {

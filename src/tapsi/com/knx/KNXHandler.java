@@ -1,4 +1,6 @@
-package com.tapsi;
+package tapsi.com.knx;
+
+import tapsi.com.logging.LogHandler;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;

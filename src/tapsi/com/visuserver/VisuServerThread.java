@@ -1,13 +1,18 @@
-package com.tapsi;
+package tapsi.com.visuserver;
 
 import javafx.util.Pair;
+import tapsi.com.data.Client;
+import tapsi.com.data.MessageHandlerThread;
+import tapsi.com.data.XMLWriter;
+import tapsi.com.database.DBHandler;
+import tapsi.com.logging.GeoDoorExceptions;
+import tapsi.com.logging.LogHandler;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;

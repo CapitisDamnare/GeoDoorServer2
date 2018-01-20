@@ -1,4 +1,6 @@
-package com.tapsi;
+package tapsi.com.clientserver;
+
+import tapsi.com.logging.LogHandler;
 
 import java.io.*;
 import java.net.Socket;

@@ -3,7 +3,7 @@
     <output-path>$PROJECT_DIR$/out/artifacts/GeoDoorServer2_jar</output-path>
     <root id="archive" name="GeoDoorServer2.jar">
       <element id="module-output" name="GeoDoorServer2" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/src/com/tapsi/sqlite-jdbc-3.20.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/src/tapsi/com/database/sqlite-jdbc-3.20.0.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

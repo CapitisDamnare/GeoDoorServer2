@@ -1,4 +1,10 @@
-package com.tapsi;
+package tapsi.com;
+
+import tapsi.com.clientserver.ServerThread;
+import tapsi.com.logging.GeoDoorExceptions;
+import tapsi.com.logging.LogHandler;
+import tapsi.com.visualization.InterfaceToVisu;
+import tapsi.com.visualization.Visualization;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -127,13 +133,13 @@ public class GeoDoorServer2 {
         });
     }
 
-    static void startServer() throws InterruptedException, IOException {
+    public static void startServer() throws InterruptedException, IOException {
         serverThread = new ServerThread();
         Thread tServerThread = new Thread(serverThread);
         tServerThread.start();
     }
 
-    static void stopServer() throws GeoDoorExceptions {
+    public static void stopServer() throws GeoDoorExceptions {
         if (serverThread != null)
             serverThread.quit();
         else

@@ -1,4 +1,6 @@
-package com.tapsi;
+package tapsi.com.data;
+
+import tapsi.com.logging.LogHandler;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;

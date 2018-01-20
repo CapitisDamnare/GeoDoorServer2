@@ -1,8 +1,7 @@
-package com.tapsi;
+package tapsi.com.visualization;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;

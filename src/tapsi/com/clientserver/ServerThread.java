@@ -1,4 +1,11 @@
-package com.tapsi;
+package tapsi.com.clientserver;
+
+import tapsi.com.data.MessageHandlerThread;
+import tapsi.com.database.DBHandler;
+import tapsi.com.knx.KNXHandler;
+import tapsi.com.logging.GeoDoorExceptions;
+import tapsi.com.logging.LogHandler;
+import tapsi.com.visuserver.VisuServerThread;
 
 import java.io.IOException;
 import java.net.ServerSocket;

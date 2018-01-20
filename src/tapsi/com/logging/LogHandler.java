@@ -1,4 +1,4 @@
-package com.tapsi;
+package tapsi.com.logging;
 
 import java.io.IOException;
 import java.sql.SQLException;

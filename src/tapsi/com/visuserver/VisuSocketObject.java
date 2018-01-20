@@ -1,8 +1,9 @@
-package com.tapsi;
+package tapsi.com.visuserver;
 
 import javafx.util.Pair;
+import tapsi.com.data.Client;
+import tapsi.com.data.XMLWriter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 

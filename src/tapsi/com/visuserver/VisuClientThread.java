@@ -1,11 +1,11 @@
-package com.tapsi;
+package tapsi.com.visuserver;
 
 import javafx.util.Pair;
+import tapsi.com.logging.LogHandler;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.Date;
-import java.util.List;
 
 public class VisuClientThread implements Runnable {
     private String clientID = null;
