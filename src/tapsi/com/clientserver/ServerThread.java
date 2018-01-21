@@ -94,7 +94,7 @@ public final class ServerThread implements Runnable {
                 pool.execute(client);
                 clientMap.put(socket.getRemoteSocketAddress().toString(), client);
 
-                System.out.println(new Date() + ": Thread Map Size: " + clientMap.size());
+                //System.out.println(new Date() + ": Thread Map Size: " + clientMap.size());
             } catch (IOException ex) {
                 LogHandler.handleError(ex);
             }
@@ -232,12 +232,12 @@ public final class ServerThread implements Runnable {
         if (clientMap.containsKey(threadId)) {
             clientMap.remove(threadId);
         }
-        System.out.println(new Date() + ": Thread Map Size: " + clientMap.size());
+        //System.out.println(new Date() + ": Thread Map Size: " + clientMap.size());
     }
 
     // send a message to e specific client
     public void sendMessageToDevice(String threadID, String msg) {
-        System.out.println(new Date() + ": Sending Message '" + msg + "' to device -> " + threadID);
+        //System.out.println(new Date() + ": Sending Message '" + msg + "' to device -> " + threadID);
         if (clientMap.containsKey(threadID)) {
             ConnectionClientThreads currentUser = clientMap.get(threadID);
             currentUser.sendMessage(msg);

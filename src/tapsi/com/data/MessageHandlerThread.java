@@ -6,6 +6,7 @@ import tapsi.com.logging.GeoDoorExceptions;
 import tapsi.com.logging.LogHandler;
 import tapsi.com.visuserver.VisuServerThread;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -132,37 +133,36 @@ public class MessageHandlerThread implements Runnable {
 
         String oldThreadID = dbHandler.selectThreadIDByPhoneID(phoneId);
 
-        if (phoneId.equals("13579") || port.equals(Integer.toString(VisuServerThread.getPORT())))
         if (checkPhoneID)
             if (checkAllowed) {
                 switch (msg) {
                     case "Gate1 open":
                         System.out.println(new Date() + ": Took message: " + message);
                         listener.onClientAnswer(oldThreadID, threadID, "answer:got Message");
-//                        try {
-//                            knxHandler.setItem("eg_tor","ON");
-//                        } catch (IOException e) {
-//                           LogHandler.handleError(e);
-//                        }
+                        try {
+                            knxHandler.setItem("eg_tor","ON");
+                        } catch (IOException e) {
+                           LogHandler.handleError(e);
+                        }
                         break;
                     case "Gate1 open auto":
                         System.out.println(new Date() + ": Took message: " + message);
                         listener.onClientAnswer(oldThreadID, threadID, "answer:got Message");
-//                        try {
-//                            knxHandler.setItem("eg_tor","ON");
-//                            knxHandler.startAutoModeTimer();
-//                        } catch (IOException e) {
-//                            LogHandler.handleError(e);
-//                        }
+                        try {
+                            knxHandler.setItem("eg_tor","ON");
+                            knxHandler.startAutoModeTimer();
+                        } catch (IOException e) {
+                            LogHandler.handleError(e);
+                        }
                         break;
                     case "Door1 open":
                         System.out.println(new Date() + ": Took message: " + message);
                         listener.onClientAnswer(oldThreadID, threadID, "answer:got Message");
-//                        try {
-//                            knxHandler.setItem("eg_tuer","ON");
-//                        } catch (IOException e) {
-//                            LogHandler.handleError(e);
-//                        }
+                        try {
+                            knxHandler.setItem("eg_tuer","ON");
+                        } catch (IOException e) {
+                            LogHandler.handleError(e);
+                        }
                         break;
                     case "Gate1 status":
                         listener.onClientAnswer(oldThreadID, threadID, "Gate1 status");

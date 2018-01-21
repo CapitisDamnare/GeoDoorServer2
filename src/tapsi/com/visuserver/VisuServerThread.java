@@ -90,7 +90,7 @@ public class VisuServerThread implements Runnable {
                 visuPool.execute(visuClient);
                 visuClientMap.put(visuSocket.getRemoteSocketAddress().toString(), visuClient);
 
-                System.out.println(new Date() + ": Visu Thread Map Size: " + visuClientMap.size());
+                //System.out.println(new Date() + ": Visu Thread Map Size: " + visuClientMap.size());
             } catch (IOException ex) {
                 LogHandler.handleError(ex);
             }
@@ -158,7 +158,7 @@ public class VisuServerThread implements Runnable {
         if (visuClientMap.containsKey(threadId)) {
             visuClientMap.remove(threadId);
         }
-        System.out.println(new Date() + ": Visu thread Map Size: " + visuClientMap.size());
+        //System.out.println(new Date() + ": Visu thread Map Size: " + visuClientMap.size());
     }
 
     public void sendVisuMessageToDevice(String oldThreadID, String threadID, String msg) {

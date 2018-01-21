@@ -27,7 +27,7 @@ public class DBHandler {
 
     public DBHandler() {
 
-        System.setProperty(LocalLog.LOCAL_LOG_LEVEL_PROPERTY,"FATAL");
+        //System.setProperty(LocalLog.LOCAL_LOG_LEVEL_PROPERTY,"FATAL");
 
         // Connect to database or create if no existent
         try {
@@ -51,12 +51,12 @@ public class DBHandler {
             LogHandler.handleError(e);
         }
 
-        try {
-            connectionSource = new JdbcConnectionSource(dbUrl);
-            clientDao = DaoManager.createDao(connectionSource, Client.class);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            //connectionSource = new JdbcConnectionSource(dbUrl);
+//            //clientDao = DaoManager.createDao(connectionSource, Client.class);
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public void insertClient(String name, String phoneID, String threadID) {

@@ -44,7 +44,7 @@ public class VisuClientThread implements Runnable {
     // Create a new input and output stream and wait for incoming messages
     @Override
     public void run() {
-        System.out.println(new Date() + ": VisuClientThread " + clientID + " started ...");
+        //System.out.println(new Date() + ": VisuClientThread " + clientID + " started ...");
         Pair<String,String> socketinputObject;
 
         try {
