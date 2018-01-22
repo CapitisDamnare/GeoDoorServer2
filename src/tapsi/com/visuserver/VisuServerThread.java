@@ -59,17 +59,18 @@ public class VisuServerThread implements Runnable {
         visuServerSocket = new ServerSocket(PORT);
         visuPool = Executors.newFixedThreadPool(10);
         new XMLWriter(dbHandler);
-        List<Client> clients = dbHandler.readAllObjects();
-        if (clients != null) {
-            VisuSocketObject visuSocketObject = new VisuSocketObject(clients,"whatever");
-        } else {
-            VisuSocketObject visuSocketObject = new VisuSocketObject("no Clients");
-        }
-        try {
-            XMLWriter.saveConfig();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        List<Client> clients = dbHandler.readAllObjects();
+        dbHandler.readAllObjects();
+//        if (clients != null) {
+//            VisuSocketObject visuSocketObject = new VisuSocketObject(clients,"whatever");
+//        } else {
+//            VisuSocketObject visuSocketObject = new VisuSocketObject("no Clients");
+//        }
+//        try {
+//            XMLWriter.saveConfig();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         System.out.println(new Date() + ": Visu Server started...");
     }

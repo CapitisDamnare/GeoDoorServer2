@@ -11,6 +11,7 @@ import tapsi.com.logging.GeoDoorExceptions;
 import tapsi.com.logging.LogHandler;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
@@ -81,8 +82,7 @@ public class DBHandler {
             } catch (SQLException e) {
                 LogHandler.handleError(e);
             }
-        }
-        else {
+        } else {
             // If insert is not possible just try tp update the client
             updateClient(name, phoneID, threadID, allowed);
         }
@@ -110,7 +110,7 @@ public class DBHandler {
         } catch (SQLException e) {
             LogHandler.handleError(e);
         }
-        String sqlPhoneID = "update Clients set name = '" + name + "', allowed = '" + allowed + "'" +" where phoneID = '" + phoneID + "'";
+        String sqlPhoneID = "update Clients set name = '" + name + "', allowed = '" + allowed + "'" + " where phoneID = '" + phoneID + "'";
         try {
             stmt.executeUpdate(sqlPhoneID);
         } catch (SQLException e) {
@@ -249,20 +249,24 @@ public class DBHandler {
     }
 
     public List<Client> readAllObjects() {
+        String sql = "select * from Clients";
         try {
-            List<Client> clients = clientDao.queryForAll();
+            ResultSet rs = stmt.executeQuery(sql);
+            System.out.println("got here1");
 
-            ListIterator iterator = clients.listIterator();
-            while (iterator.hasNext()) {
-                Client client = (Client) iterator.next();
-                //client.printData();
-
+            while (rs.next()) {
+                String result = rs.getString(1);
+                System.out.println(result);
+                System.out.println("got here+");
             }
-            return clients;
+            //rs.next();
+            rs.close();
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            LogHandler.handleError(e);
             return null;
         }
+        return null;
     }
 
     public void closeDB() {
