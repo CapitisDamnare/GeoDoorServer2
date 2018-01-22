@@ -211,6 +211,7 @@ public class MessageHandlerThread implements Runnable {
         String messageTemp = message;
         String name = messageTemp.substring(0, messageTemp.indexOf("-"));
         messageTemp = messageTemp.replace(name + "-", "");
+        messageTemp = messageTemp.replace("#", "");
 
         String phoneId = messageTemp;
 

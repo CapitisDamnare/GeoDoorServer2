@@ -1,27 +1,17 @@
 package tapsi.com.data;
 
 
-import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.table.DatabaseTable;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 
-@DatabaseTable(tableName = "Clients")
 public class Client {
 
-    @DatabaseField(generatedId = true, unique = true)
     private int id;
-    @DatabaseField(canBeNull = false)
     private String name;
-    @DatabaseField(canBeNull = false, unique = true)
     private String phoneID;
-    @DatabaseField(unique = true)
     private String threadID;
-    @DatabaseField(defaultValue = "0")
     private int allowed;
-    @DatabaseField
     private String lastConnection;
 
 

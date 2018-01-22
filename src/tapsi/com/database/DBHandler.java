@@ -1,11 +1,6 @@
 package tapsi.com.database;
 
 
-import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.dao.DaoManager;
-import com.j256.ormlite.jdbc.JdbcConnectionSource;
-import com.j256.ormlite.logger.LocalLog;
-import com.j256.ormlite.support.ConnectionSource;
 import tapsi.com.data.Client;
 import tapsi.com.logging.GeoDoorExceptions;
 import tapsi.com.logging.LogHandler;
@@ -14,7 +9,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.ListIterator;
 
 public class DBHandler {
 
@@ -22,13 +16,8 @@ public class DBHandler {
     private Connection c = null;
     private Statement stmt = null;
 
-    Dao<Client, String> clientDao;
-    ConnectionSource connectionSource;
-
 
     public DBHandler() {
-
-        //System.setProperty(LocalLog.LOCAL_LOG_LEVEL_PROPERTY,"FATAL");
 
         // Connect to database or create if no existent
         try {
@@ -51,13 +40,6 @@ public class DBHandler {
         } catch (SQLException e) {
             LogHandler.handleError(e);
         }
-
-//        try {
-//            //connectionSource = new JdbcConnectionSource(dbUrl);
-//            //clientDao = DaoManager.createDao(connectionSource, Client.class);
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
     }
 
     public void insertClient(String name, String phoneID, String threadID) {
@@ -249,24 +231,28 @@ public class DBHandler {
     }
 
     public List<Client> readAllObjects() {
+        List<Client> clients = new ArrayList<>();
         String sql = "select * from Clients";
         try {
             ResultSet rs = stmt.executeQuery(sql);
-            System.out.println("got here1");
 
             while (rs.next()) {
-                String result = rs.getString(1);
-                System.out.println(result);
-                System.out.println("got here+");
+                Client client = new Client();
+                client.setId(rs.getInt(1));
+                client.setName(rs.getString(2));
+                client.setPhoneID(rs.getString(3));
+                client.setThreadID(rs.getString(4));
+                client.setAllowed(rs.getInt(5));
+                client.setLastConnection(rs.getString(6));
+                clients.add(client);
             }
-            //rs.next();
             rs.close();
+            return clients;
 
         } catch (SQLException e) {
             LogHandler.handleError(e);
             return null;
         }
-        return null;
     }
 
     public void closeDB() {

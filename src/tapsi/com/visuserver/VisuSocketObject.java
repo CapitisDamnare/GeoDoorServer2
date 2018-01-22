@@ -1,6 +1,5 @@
 package tapsi.com.visuserver;
 
-import javafx.util.Pair;
 import tapsi.com.data.Client;
 import tapsi.com.data.XMLWriter;
 
@@ -57,8 +56,8 @@ public class VisuSocketObject {
         clients.add(client);
     }
 
-    public Pair<String,String> getContainer () {
-        return new Pair<>(this.message, XMLWriter.getXml());
+    public String getContainer () {
+        return this.message + "!" + XMLWriter.getXml();
     }
 
     public void printAll() {

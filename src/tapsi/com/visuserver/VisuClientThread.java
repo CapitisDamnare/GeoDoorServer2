@@ -1,6 +1,5 @@
 package tapsi.com.visuserver;
 
-import javafx.util.Pair;
 import tapsi.com.logging.LogHandler;
 
 import java.io.*;
@@ -23,7 +22,7 @@ public class VisuClientThread implements Runnable {
 
     public interface VisuClientListener {
         public void onVisuClientClosed(String id);
-        public void onVisuMessage (String clientID, Pair<String,String> msg);
+        public void onVisuMessage (String clientID, String msg);
     }
 
     public String getClientID() {
@@ -45,7 +44,7 @@ public class VisuClientThread implements Runnable {
     @Override
     public void run() {
         //System.out.println(new Date() + ": VisuClientThread " + clientID + " started ...");
-        Pair<String,String> socketinputObject;
+        String socketinputObject;
 
         try {
             objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
@@ -57,7 +56,7 @@ public class VisuClientThread implements Runnable {
         }
 
         try {
-            while ((socketinputObject = (Pair<String,String>) objectInputStream.readObject()) != null) {
+            while ((socketinputObject = (String) objectInputStream.readObject()) != null) {
                 listener.onVisuMessage(clientID, socketinputObject);
             }
         } catch (IOException ex) {
@@ -106,7 +105,7 @@ public class VisuClientThread implements Runnable {
 
     public void sendMessage(String text) {
         VisuSocketObject visuSocketObject = new VisuSocketObject(text);
-        Pair<String,String> container = visuSocketObject.getContainer();
+        String container = visuSocketObject.getContainer();
         try {
             objectOutputStream.writeObject(container);
         } catch (IOException ex) {
@@ -114,7 +113,7 @@ public class VisuClientThread implements Runnable {
         }
     }
 
-    public void sendObject(Pair<String,String> msg) {
+    public void sendObject(String msg) {
         try {
             objectOutputStream.writeObject(msg);
         } catch (IOException ex) {

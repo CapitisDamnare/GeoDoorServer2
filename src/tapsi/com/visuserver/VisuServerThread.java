@@ -1,6 +1,5 @@
 package tapsi.com.visuserver;
 
-import javafx.util.Pair;
 import tapsi.com.data.Client;
 import tapsi.com.data.MessageHandlerThread;
 import tapsi.com.data.XMLReader;
@@ -23,10 +22,10 @@ import java.util.concurrent.TimeUnit;
 
 public class VisuServerThread implements Runnable {
 
-    private static final int PORT = 9999;
+    private static final int PORT = 5678;
 
     // Temp Variable ... i know bad design i guess
-    Pair<String,List<String>> tempClient;
+    Map<String,List<String>> tempClient;
 
     // Message Handler for incoming messages
     private MessageHandlerThread msgHandler = null;
@@ -59,18 +58,17 @@ public class VisuServerThread implements Runnable {
         visuServerSocket = new ServerSocket(PORT);
         visuPool = Executors.newFixedThreadPool(10);
         new XMLWriter(dbHandler);
-//        List<Client> clients = dbHandler.readAllObjects();
-        dbHandler.readAllObjects();
-//        if (clients != null) {
-//            VisuSocketObject visuSocketObject = new VisuSocketObject(clients,"whatever");
-//        } else {
-//            VisuSocketObject visuSocketObject = new VisuSocketObject("no Clients");
-//        }
-//        try {
-//            XMLWriter.saveConfig();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        List<Client> clients = dbHandler.readAllObjects();
+        if (clients != null) {
+            VisuSocketObject visuSocketObject = new VisuSocketObject(clients,"whatever");
+        } else {
+            VisuSocketObject visuSocketObject = new VisuSocketObject("no Clients");
+        }
+        try {
+            XMLWriter.saveConfig();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         System.out.println(new Date() + ": Visu Server started...");
     }
@@ -109,8 +107,13 @@ public class VisuServerThread implements Runnable {
             }
 
             @Override
-            public void onVisuMessage(String clientID, Pair<String,String> msg) {
-                msgHandler.putMessage( PORT + "#" + clientID + "#" + msg.getKey() + "#" + msg.getValue());
+            public void onVisuMessage(String clientID, String msg) {
+                String messageTemp = msg;
+                String command = messageTemp.substring(0, messageTemp.indexOf("!"));
+                messageTemp = messageTemp.replace(command + "!", "");
+
+                String value = messageTemp;
+                msgHandler.putMessage( PORT + "#" + clientID + "#" + command + "#" + value);
             }
         });
     }
@@ -174,7 +177,7 @@ public class VisuServerThread implements Runnable {
     }
 
     public void sendVisuObjectToDevice(String oldThreadID, String threadID, String msg) {
-        Pair<String,String> socketOutput;
+        String socketOutput;
         List<Client> clients = dbHandler.readAllObjects();
         if (clients != null) {
             VisuSocketObject visuSocketObject = new VisuSocketObject(clients,msg);
@@ -210,7 +213,7 @@ public class VisuServerThread implements Runnable {
     }
 
     // send a message to e specific client
-    private void sendObjectToDevice(String threadID, Pair<String,String> msg) {
+    private void sendObjectToDevice(String threadID, String msg) {
         System.out.println(new Date() + ": Sending Object Message to device -> " + threadID);
         if (visuClientMap.containsKey(threadID)) {
             VisuClientThread currentUser = visuClientMap.get(threadID);
