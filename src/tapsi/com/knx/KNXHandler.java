@@ -47,7 +47,7 @@ public class KNXHandler {
 
     public KNXHandler() {
         System.out.println(new Date() + ": KNX Handler started...");
-        //startTimer();
+        startTimer();
     }
 
     public void getDoorStatus() {

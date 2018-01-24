@@ -160,15 +160,18 @@ public final class ServerThread implements Runnable {
             public void onDoorStatChanged(int value) {
                 for (Map.Entry<String, ConnectionClientThreads> entry : clientMap.entrySet()) {
                     ConnectionClientThreads mapClient = entry.getValue();
-                    if (value == 4)
+                    if (value == 4) {
                         gateStatus = "answer:door1 open";
-                        //mapClient.sendMessage("answer:door1 open");
-                    else if (value == 0)
+                        mapClient.sendMessage("answer:door1 open");
+                    }
+                    else if (value == 0) {
                         gateStatus = "answer:door1 closed";
-                        //mapClient.sendMessage("answer:door1 closed");
-                    else if (value == 2)
+                        mapClient.sendMessage("answer:door1 closed");
+                    }
+                    else if (value == 2) {
                         gateStatus = "answer:door1 stopped";
-                    //mapClient.sendMessage("answer:door1 stopped");
+                        mapClient.sendMessage("answer:door1 stopped");
+                    }
                 }
             }
 
