@@ -70,7 +70,7 @@ public class VisuServerThread implements Runnable {
             e.printStackTrace();
         }
 
-        System.out.println(new Date() + ": Visu Server started...");
+        LogHandler.printLog(new Date() + ": Visu Server started...");
     }
 
     public static int getPORT() {
@@ -89,12 +89,12 @@ public class VisuServerThread implements Runnable {
                 visuPool.execute(visuClient);
                 visuClientMap.put(visuSocket.getRemoteSocketAddress().toString(), visuClient);
 
-                //System.out.println(new Date() + ": Visu Thread Map Size: " + visuClientMap.size());
+                //LogHandler.printLog(new Date() + ": Visu Thread Map Size: " + visuClientMap.size());
             } catch (IOException ex) {
                 LogHandler.handleError(ex);
             }
         }
-        System.out.println(new Date() + ": Visu Server stopped");
+        LogHandler.printLog(new Date() + ": Visu Server stopped");
         shutdownAndAwaitTermination(visuPool);
     }
 
@@ -126,7 +126,7 @@ public class VisuServerThread implements Runnable {
                 pool.shutdownNow(); // Cancel currently executing tasks
                 // Wait a while for tasks to respond to being cancelled
                 if (!pool.awaitTermination(10, TimeUnit.SECONDS)) {
-                    System.out.println(new Date() + ": Visu Pool did not terminate");
+                    LogHandler.printLog(new Date() + ": Visu Pool did not terminate");
                 }
             }
         } catch (InterruptedException ex) {
@@ -162,7 +162,7 @@ public class VisuServerThread implements Runnable {
         if (visuClientMap.containsKey(threadId)) {
             visuClientMap.remove(threadId);
         }
-        //System.out.println(new Date() + ": Visu thread Map Size: " + visuClientMap.size());
+        //LogHandler.printLog(new Date() + ": Visu thread Map Size: " + visuClientMap.size());
     }
 
     public void sendVisuMessageToDevice(String oldThreadID, String threadID, String msg) {
@@ -171,7 +171,7 @@ public class VisuServerThread implements Runnable {
             VisuClientThread mapClient = visuClientMap.get(oldThreadID);
             mapClient.closeThread();
             visuClientMap.remove(oldThreadID);
-            System.out.println(new Date() + ": Closed old active visu connection: " + oldThreadID);
+            LogHandler.printLog(new Date() + ": Closed old active visu connection: " + oldThreadID);
         } else
             sendMessageToDevice(threadID, msg);
     }
@@ -192,14 +192,14 @@ public class VisuServerThread implements Runnable {
             VisuClientThread mapClient = visuClientMap.get(oldThreadID);
             mapClient.closeThread();
             visuClientMap.remove(oldThreadID);
-            System.out.println(new Date() + ": Closed old active visu connection: " + oldThreadID);
+            LogHandler.printLog(new Date() + ": Closed old active visu connection: " + oldThreadID);
         } else
             sendObjectToDevice(threadID, socketOutput);
     }
 
     // send a message to e specific client
     private void sendMessageToDevice(String threadID, String msg) {
-        System.out.println(new Date() + ": Sending Visu Message '" + msg +"' to device -> " + threadID);
+        LogHandler.printLog(new Date() + ": Sending Visu Message '" + msg +"' to device -> " + threadID);
         if (visuClientMap.containsKey(threadID)) {
             VisuClientThread currentUser = visuClientMap.get(threadID);
             currentUser.sendMessage(msg);
@@ -214,7 +214,7 @@ public class VisuServerThread implements Runnable {
 
     // send a message to e specific client
     private void sendObjectToDevice(String threadID, String msg) {
-        System.out.println(new Date() + ": Sending Object Message to device -> " + threadID);
+        LogHandler.printLog(new Date() + ": Sending Object Message to device -> " + threadID);
         if (visuClientMap.containsKey(threadID)) {
             VisuClientThread currentUser = visuClientMap.get(threadID);
             currentUser.sendObject(msg);
@@ -236,7 +236,7 @@ public class VisuServerThread implements Runnable {
             VisuClientThread mapClient = entry.getValue();
             String name = dbHandler.selectNameByThreadID(mapClient.getClientID());
             String lastConnection = dbHandler.selectLastConnectionByThreadID(mapClient.getClientID());
-            System.out.println("Name: " + name + " - last connection at: " + lastConnection);
+            LogHandler.printLog("Name: " + name + " - last connection at: " + lastConnection);
         }
     }
 
@@ -256,7 +256,7 @@ public class VisuServerThread implements Runnable {
             VisuClientThread mapClient = visuClientMap.get(oldThreadID);
             mapClient.closeThread();
             visuClientMap.remove(oldThreadID);
-            System.out.println(new Date() + ": Closed old active visu connection: " + oldThreadID);
+            LogHandler.printLog(new Date() + ": Closed old active visu connection: " + oldThreadID);
         } else
             sendMessageToDevice(threadID, "answer:ok");
 

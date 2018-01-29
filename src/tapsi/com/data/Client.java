@@ -1,6 +1,8 @@
 package tapsi.com.data;
 
 
+import tapsi.com.logging.LogHandler;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
@@ -77,12 +79,12 @@ public class Client {
     }
 
     public void printData() {
-        System.out.println("_id: " + id);
-        System.out.println("_name: " + name);
-        System.out.println("_phoneID: " + phoneID);
-        System.out.println("_threadID: " + threadID);
-        System.out.println("_allowed: " + allowed);
-        System.out.println("_lastConnection: " + lastConnection);
+        LogHandler.printLog("_id: " + id);
+        LogHandler.printLog("_name: " + name);
+        LogHandler.printLog("_phoneID: " + phoneID);
+        LogHandler.printLog("_threadID: " + threadID);
+        LogHandler.printLog("_allowed: " + allowed);
+        LogHandler.printLog("_lastConnection: " + lastConnection);
     }
 
     public List<String> getData() {

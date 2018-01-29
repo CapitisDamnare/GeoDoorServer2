@@ -43,7 +43,7 @@ public class VisuClientThread implements Runnable {
     // Create a new input and output stream and wait for incoming messages
     @Override
     public void run() {
-        //System.out.println(new Date() + ": VisuClientThread " + clientID + " started ...");
+        //LogHandler.printLog(new Date() + ": VisuClientThread " + clientID + " started ...");
         String socketinputObject;
 
         try {
@@ -60,7 +60,7 @@ public class VisuClientThread implements Runnable {
                 listener.onVisuMessage(clientID, socketinputObject);
             }
         } catch (IOException ex) {
-            //System.out.println(new Date() + ": VisuClientThread stopped from client -> " + clientID);
+            //LogHandler.printLog(new Date() + ": VisuClientThread stopped from client -> " + clientID);
             LogHandler.handleError(ex);
         } catch (ClassNotFoundException ex) {
             LogHandler.handleError(ex);
@@ -75,7 +75,7 @@ public class VisuClientThread implements Runnable {
                 listener.onVisuClientClosed(clientID);
                 socket.close();
             } catch (IOException ex) {
-                //System.out.println(new Date() + ": VisuClientThread stopped from client -> " + clientID);
+                //LogHandler.printLog(new Date() + ": VisuClientThread stopped from client -> " + clientID);
                 LogHandler.handleError(ex);
             }
         }
@@ -95,7 +95,7 @@ public class VisuClientThread implements Runnable {
             if (objectOutputStream != null) {
                 objectOutputStream.close();
             }
-            System.out.println(new Date() + ": VisuClientThread stopped from server -> " + clientID);
+            LogHandler.printLog(new Date() + ": VisuClientThread stopped from server -> " + clientID);
             LogHandler.printPrompt();
             socket.close();
         } catch (IOException ex) {

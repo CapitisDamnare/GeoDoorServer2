@@ -75,7 +75,7 @@ public final class ServerThread implements Runnable {
         // Start the Server
         serverSocket = new ServerSocket(PORT);
         pool = Executors.newFixedThreadPool(10);
-        System.out.println(new Date() + ": Client Server started...");
+        LogHandler.printLog(new Date() + ": Client Server started...");
     }
 
     public static int getPORT() {
@@ -94,12 +94,12 @@ public final class ServerThread implements Runnable {
                 pool.execute(client);
                 clientMap.put(socket.getRemoteSocketAddress().toString(), client);
 
-                //System.out.println(new Date() + ": Thread Map Size: " + clientMap.size());
+                //LogHandler.printLog(new Date() + ": Thread Map Size: " + clientMap.size());
             } catch (IOException ex) {
                 LogHandler.handleError(ex);
             }
         }
-        System.out.println(new Date() + ": Server stopped");
+        LogHandler.printLog(new Date() + ": Server stopped");
         shutdownAndAwaitTermination(pool);
     }
 
@@ -128,7 +128,7 @@ public final class ServerThread implements Runnable {
                     ConnectionClientThreads mapClient = clientMap.get(oldThreadID);
                     mapClient.closeThread();
                     clientMap.remove(oldThreadID);
-                    System.out.println(new Date() + ": Closed old active connection: " + oldThreadID);
+                    LogHandler.printLog(new Date() + ": Closed old active connection: " + oldThreadID);
                 }
                 if (message.equals("Gate1 status")) {
                     knxHandler.getDoorStatus();
@@ -150,6 +150,11 @@ public final class ServerThread implements Runnable {
             @Override
             public void onSafeClient(String oldThreadID, String threadID, String message) {
                 visuServerThread.safeClient(oldThreadID, threadID, message);
+            }
+
+            @Override
+            public void onSendLog(String oldThreadID, String threadID, String message) {
+                visuServerThread.sendVisuMessageToDevice(oldThreadID, threadID, message);
             }
         });
     }
@@ -194,7 +199,7 @@ public final class ServerThread implements Runnable {
                 pool.shutdownNow(); // Cancel currently executing tasks
                 // Wait a while for tasks to respond to being cancelled
                 if (!pool.awaitTermination(10, TimeUnit.SECONDS)) {
-                    System.out.println(new Date() + ": Pool did not terminate");
+                    LogHandler.printLog(new Date() + ": Pool did not terminate");
                 }
             }
         } catch (InterruptedException ex) {
@@ -235,12 +240,12 @@ public final class ServerThread implements Runnable {
         if (clientMap.containsKey(threadId)) {
             clientMap.remove(threadId);
         }
-        //System.out.println(new Date() + ": Thread Map Size: " + clientMap.size());
+        //LogHandler.printLog(new Date() + ": Thread Map Size: " + clientMap.size());
     }
 
     // send a message to e specific client
     public void sendMessageToDevice(String threadID, String msg) {
-        //System.out.println(new Date() + ": Sending Message '" + msg + "' to device -> " + threadID);
+        //LogHandler.printLog(new Date() + ": Sending Message '" + msg + "' to device -> " + threadID);
         if (clientMap.containsKey(threadID)) {
             ConnectionClientThreads currentUser = clientMap.get(threadID);
             currentUser.sendMessage(msg);
@@ -286,7 +291,7 @@ public final class ServerThread implements Runnable {
             ConnectionClientThreads mapClient = entry.getValue();
             String name = dbHandler.selectNameByThreadID(mapClient.getClientID());
             String lastConnection = dbHandler.selectLastConnectionByThreadID(mapClient.getClientID());
-            System.out.println("Name: " + name + " - last connection at: " + lastConnection);
+            LogHandler.printLog("Name: " + name + " - last connection at: " + lastConnection);
         }
     }
 }

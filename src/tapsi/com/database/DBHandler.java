@@ -28,7 +28,7 @@ public class DBHandler {
         } catch (SQLException e) {
             LogHandler.handleError(e);
         }
-        System.out.println(new Date() + ": Connected to DB!");
+        LogHandler.printLog(new Date() + ": Connected to DB!");
 
         // Create table if not existent
         try {

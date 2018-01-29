@@ -41,7 +41,7 @@ public class ConnectionClientThreads implements Runnable {
     // Create a new input and output stream and wait for incoming messages
     @Override
     public void run() {
-        //System.out.println(new Date() + ": ClientThread " + clientID + " started ...");
+        //LogHandler.printLog(new Date() + ": ClientThread " + clientID + " started ...");
 
         try {
             inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -60,7 +60,7 @@ public class ConnectionClientThreads implements Runnable {
                     inputStream.close();
             }
         } catch (IOException ex) {
-            //System.out.println(new Date() + ": ClientThread stopped from client -> " + clientID);
+            //LogHandler.printLog(new Date() + ": ClientThread stopped from client -> " + clientID);
             LogHandler.handleError(ex);
         } finally {
             try {
@@ -73,7 +73,7 @@ public class ConnectionClientThreads implements Runnable {
                 listener.onClientClosed(clientID);
                 socket.close();
             } catch (IOException ex) {
-                //System.out.println(new Date() + ": ClientThread stopped from client -> " + clientID);
+                //LogHandler.printLog(new Date() + ": ClientThread stopped from client -> " + clientID);
                 LogHandler.handleError(ex);
             }
         }
@@ -95,7 +95,7 @@ public class ConnectionClientThreads implements Runnable {
             if (outputStream != null) {
                 outputStream.close();
             }
-            System.out.println(new Date() + ": ClientThread stopped from server -> " + clientID);
+            LogHandler.printLog(new Date() + ": ClientThread stopped from server -> " + clientID);
             LogHandler.printPrompt();
             socket.close();
         } catch (IOException ex) {

@@ -6,6 +6,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import tapsi.com.logging.LogHandler;
+
 import java.util.concurrent.CountDownLatch;
 
 public class Visualization extends Application {
@@ -44,7 +46,7 @@ public class Visualization extends Application {
     }
 
     public void printSomething() {
-        System.out.println("You called a method on the application");
+        LogHandler.printLog("You called a method on the application");
     }
 
     @Override

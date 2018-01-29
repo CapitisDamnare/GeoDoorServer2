@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Date;
 
+/**
+ * Main class of the application and handles all command line user inputs.
+ */
 public class GeoDoorServer2 {
 
     private static InterfaceToVisu inVisu = null;
@@ -18,6 +21,11 @@ public class GeoDoorServer2 {
     private static boolean quit = false;
     private static Visualization visu = null;
 
+    /**
+     * Main Method of the application
+     *
+     * @param args
+     */
     public static void main(String[] args) {
 
         LogHandler.setDebugMode(true);
@@ -50,8 +58,14 @@ public class GeoDoorServer2 {
         }
     }
 
-    // Todo: add console command to list and give permission to user
-    // Console Commands
+    // Todo: add console command: set permission
+
+    /**
+     * Checks the command provided in the command line and calls the corresponding method
+     *
+     * @param command
+     * @throws GeoDoorExceptions
+     */
     private static void checkCommand(String command) throws GeoDoorExceptions {
         switch (command) {
             case "quit":
@@ -94,25 +108,25 @@ public class GeoDoorServer2 {
                 serverThread.setDoorStatus(false);
                 break;
             case "message queue":
-                System.out.println(new Date() + ": Message queue Size: " + serverThread.getMessageQueueSize());
+                LogHandler.printLog(new Date() + ": Message queue Size: " + serverThread.getMessageQueueSize());
                 break;
             case "connected users":
-                System.out.println(new Date() + ": Connected users:\n");
+                LogHandler.printLog(new Date() + ": Connected users:\n");
                 serverThread.getUsers();
                 break;
             case "help":
-                System.out.println("quit                - disables the server and ends the program");
-                System.out.println("show                - show visualisation");
-                System.out.println("hide                - hide visualisation");
-                System.out.println("start               - starts the server");
-                System.out.println("debug on            - enables error debug messages");
-                System.out.println("debug off           - disable error debug messages");
-                System.out.println("knx on              - enables knx thread (door status)");
-                System.out.println("knx off             - disable knx thread (door status)");
-                System.out.println("set door open       - set door to open state");
-                System.out.println("set door closed     - set door to closed state");
-                System.out.println("message queue       - gets the current message queue size");
-                System.out.println("connected users     - shows a list of the current connected users");
+                LogHandler.printLog("quit                - disables the server and ends the program");
+                LogHandler.printLog("show                - show visualisation");
+                LogHandler.printLog("hide                - hide visualisation");
+                LogHandler.printLog("start               - starts the server");
+                LogHandler.printLog("debug on            - enables error debug messages");
+                LogHandler.printLog("debug off           - disable error debug messages");
+                LogHandler.printLog("knx on              - enables knx thread (door status)");
+                LogHandler.printLog("knx off             - disable knx thread (door status)");
+                LogHandler.printLog("set door open       - set door to open state");
+                LogHandler.printLog("set door closed     - set door to closed state");
+                LogHandler.printLog("message queue       - gets the current message queue size");
+                LogHandler.printLog("connected users     - shows a list of the current connected users");
                 break;
 
             // Test commands delete later
@@ -124,21 +138,38 @@ public class GeoDoorServer2 {
         }
     }
 
+    /**
+     * Not usable in a raspberry PI3 application
+     * Custom listener for a JavaFx visualization
+     *
+     * @param visu
+     */
     static void initVisuListener (Visualization visu) {
         visu.setCustomListener(new Visualization.VisListener() {
             @Override
             public void onStart() {
-                System.out.println("got onStart!");
+                LogHandler.printLog("got onStart!");
             }
         });
     }
 
+    /**
+     * Command to start the server. Starts the server thread.
+     *
+     * @throws InterruptedException
+     * @throws IOException
+     */
     public static void startServer() throws InterruptedException, IOException {
         serverThread = new ServerThread();
         Thread tServerThread = new Thread(serverThread);
         tServerThread.start();
     }
 
+    /**
+     * Command to stop the server. Ends the server thread.
+     *
+     * @throws GeoDoorExceptions
+     */
     public static void stopServer() throws GeoDoorExceptions {
         if (serverThread != null)
             serverThread.quit();
@@ -146,6 +177,11 @@ public class GeoDoorServer2 {
             throw new GeoDoorExceptions("Can't stop not started server!");
     }
 
+    /**
+     * Command to quit the application and calls stopServer.
+     *
+     * @param val
+     */
     private static void setQuit(boolean val) {
         try {
             //visu.closeVisualization();
@@ -157,6 +193,13 @@ public class GeoDoorServer2 {
         quit = val;
     }
 
+    /**
+     * @Version Windows
+     * Not usable in a raspberry PI3 application.
+     * Hides the JavaFX visualization.
+     *
+     * @param val
+     */
     private static void showHideVisu(boolean val) {
         inVisu.showVisualization(val);
     }

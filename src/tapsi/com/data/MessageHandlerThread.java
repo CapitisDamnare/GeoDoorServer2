@@ -21,13 +21,15 @@ public class MessageHandlerThread implements Runnable {
     private messageListener listener;
 
     public interface messageListener {
-        public void onClientAnswer(String oldThreadID, String threadID, String message);
+        void onClientAnswer(String oldThreadID, String threadID, String message);
 
-        public void onVisuAnswer(String oldThreadID, String threadID, String message);
+        void onVisuAnswer(String oldThreadID, String threadID, String message);
 
-        public void onSendAllClients(String oldThreadID, String threadID, String message);
+        void onSendAllClients(String oldThreadID, String threadID, String message);
 
-        public void onSafeClient(String oldThreadID, String threadID, String message);
+        void onSafeClient(String oldThreadID, String threadID, String message);
+
+        void onSendLog(String oldThreadID, String threadID, String message);
     }
 
     public void setCustomListener(messageListener listener) {
@@ -56,7 +58,7 @@ public class MessageHandlerThread implements Runnable {
     // Check permanently the queue for new messages to handle
     @Override
     public void run() {
-        System.out.println(new Date() + ": MessagHandlerThread started ...");
+        LogHandler.printLog(new Date() + ": MessagHandlerThread started ...");
         while (close) {
             if (queue.size() > 0) {
                 try {
@@ -76,26 +78,26 @@ public class MessageHandlerThread implements Runnable {
 
                         switch (command) {
                             case "register":
-                                System.out.println(new Date() + ": Took message: " + original);
+                                LogHandler.printLog(new Date() + ": Took message: " + original);
                                 commandRegister(threadID, message, port);
                                 break;
                             case "visuRegister":
-                                System.out.println(new Date() + ": Took message: " + original);
+                                LogHandler.printLog(new Date() + ": Took message: " + original);
                                 commandVisuRegister(threadID, message, port);
                                 break;
                             case "output":
                                 commandOutput(threadID, message, port);
                                 break;
                             case "server":
-                                System.out.println(new Date() + ": Took server message: " + original);
+                                LogHandler.printLog(new Date() + ": Took server message: " + original);
                                 commandVisuServer(threadID, message, port);
                                 break;
                             case "update":
-                                System.out.println(new Date() + ": Got update message: " );
+                                LogHandler.printLog(new Date() + ": Got update message: ");
                                 updateVisuServer(threadID, message, port);
                                 break;
                             case "pong":
-                                //System.out.println(new Date() + ": Took message: " + original);
+                                //LogHandler.printLog(new Date() + ": Took message: " + original);
                                 break;
                             default:
                                 throw new GeoDoorExceptions("Sent socket command doesn't exist: " + original);
@@ -137,29 +139,29 @@ public class MessageHandlerThread implements Runnable {
             if (checkAllowed) {
                 switch (msg) {
                     case "Gate1 open":
-                        System.out.println(new Date() + ": Took message: " + message);
+                        LogHandler.printLog(new Date() + ": Took message: " + message);
                         listener.onClientAnswer(oldThreadID, threadID, "answer:got Message");
                         try {
-                            knxHandler.setItem("eg_tor","ON");
+                            knxHandler.setItem("eg_tor", "ON");
                         } catch (IOException e) {
-                           LogHandler.handleError(e);
+                            LogHandler.handleError(e);
                         }
                         break;
                     case "Gate1 open auto":
-                        System.out.println(new Date() + ": Took message: " + message);
+                        LogHandler.printLog(new Date() + ": Took message: " + message);
                         listener.onClientAnswer(oldThreadID, threadID, "answer:got Message");
                         try {
-                            knxHandler.setItem("eg_tor","ON");
+                            knxHandler.setItem("eg_tor", "ON");
                             knxHandler.startAutoModeTimer();
                         } catch (IOException e) {
                             LogHandler.handleError(e);
                         }
                         break;
                     case "Door1 open":
-                        System.out.println(new Date() + ": Took message: " + message);
+                        LogHandler.printLog(new Date() + ": Took message: " + message);
                         listener.onClientAnswer(oldThreadID, threadID, "answer:got Message");
                         try {
-                            knxHandler.setItem("eg_tuer","ON");
+                            knxHandler.setItem("eg_tuer", "ON");
                         } catch (IOException e) {
                             LogHandler.handleError(e);
                         }
@@ -252,7 +254,14 @@ public class MessageHandlerThread implements Runnable {
         if (phoneId.equals("13579") && port.equals(Integer.toString(VisuServerThread.getPORT()))) {
             if (checkPhoneID) {
                 if (checkAllowed) {
-                    listener.onSendAllClients(oldThreadID, threadID, "answer:ok");
+                    switch (message) {
+                        case "clients":
+                            listener.onSendAllClients(oldThreadID, threadID, "answer:clients");
+                            break;
+                        case "log":
+                            listener.onSendLog(oldThreadID, threadID, "answer:log!" + LogHandler.getLog());
+                            break;
+                    }
                 }
             }
         }

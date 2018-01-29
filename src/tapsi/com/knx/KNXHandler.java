@@ -46,7 +46,7 @@ public class KNXHandler {
     }
 
     public KNXHandler() {
-        System.out.println(new Date() + ": KNX Handler started...");
+        LogHandler.printLog(new Date() + ": KNX Handler started...");
         startTimer();
     }
 
@@ -82,9 +82,9 @@ public class KNXHandler {
         wr.close();
 
         int responseCode = con.getResponseCode();
-        //System.out.println("\nSending 'POST' request to URL : " + url);
-        //System.out.println("Post parameters : " + urlParameters);
-        //System.out.println("Response Code : " + responseCode);
+        //LogHandler.printLog("\nSending 'POST' request to URL : " + url);
+        //LogHandler.printLog("Post parameters : " + urlParameters);
+        //LogHandler.printLog("Response Code : " + responseCode);
 
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
@@ -97,7 +97,7 @@ public class KNXHandler {
         in.close();
 
         //print result
-        System.out.println(new Date() + ": knx response code: " +String.valueOf(responseCode));
+        LogHandler.printLog(new Date() + ": knx response code: " +String.valueOf(responseCode));
     }
 
     public String getItem(String item) {
@@ -128,8 +128,8 @@ public class KNXHandler {
         int responseCode = 0;
         try {
             responseCode = con.getResponseCode();
-            //System.out.println("\nSending 'GET' request to URL : " + url);
-            //System.out.println("Response Code : " + responseCode);
+            //LogHandler.printLog("\nSending 'GET' request to URL : " + url);
+            //LogHandler.printLog("Response Code : " + responseCode);
 
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(con.getInputStream()));
