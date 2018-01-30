@@ -104,10 +104,8 @@ public class VisuClientThread implements Runnable {
     }
 
     public void sendMessage(String text) {
-        VisuSocketObject visuSocketObject = new VisuSocketObject(text);
-        String container = visuSocketObject.getContainer();
         try {
-            objectOutputStream.writeObject(container);
+            objectOutputStream.writeObject(text);
         } catch (IOException ex) {
             LogHandler.handleError(ex);
         }

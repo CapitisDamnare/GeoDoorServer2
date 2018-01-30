@@ -225,12 +225,12 @@ public class MessageHandlerThread implements Runnable {
         if (phoneId.equals("13579") && port.equals(Integer.toString(VisuServerThread.getPORT()))) {
             if (checkPhoneID) {
                 if (!checkAllowed) {
-                    listener.onVisuAnswer(oldThreadID, threadID, "answer:not yet allowed");
+                    listener.onVisuAnswer(oldThreadID, threadID, "answer:not yet allowed!");
                 } else {
-                    listener.onVisuAnswer(oldThreadID, threadID, "answer:allowed");
+                    listener.onVisuAnswer(oldThreadID, threadID, "answer:allowed!");
                 }
             } else {
-                listener.onVisuAnswer(oldThreadID, threadID, "answer:registered ... waiting for permission");
+                listener.onVisuAnswer(oldThreadID, threadID, "answer:registered ... waiting for permission!");
             }
         }
         // Will automatically insert or update
@@ -240,6 +240,8 @@ public class MessageHandlerThread implements Runnable {
     private void commandVisuServer(String threadID, String message, String port) {
 
         String messageTemp = message;
+        String command = messageTemp.substring(0, messageTemp.indexOf(":"));
+        messageTemp = messageTemp.replace(command + ":", "");
         String name = messageTemp.substring(0, messageTemp.indexOf("-"));
         messageTemp = messageTemp.replace(name + "-", "");
         messageTemp = messageTemp.replace("#", "");
@@ -254,7 +256,7 @@ public class MessageHandlerThread implements Runnable {
         if (phoneId.equals("13579") && port.equals(Integer.toString(VisuServerThread.getPORT()))) {
             if (checkPhoneID) {
                 if (checkAllowed) {
-                    switch (message) {
+                    switch (command) {
                         case "clients":
                             listener.onSendAllClients(oldThreadID, threadID, "answer:clients");
                             break;
