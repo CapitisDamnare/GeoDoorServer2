@@ -2,7 +2,10 @@ package tapsi.com.logging;
 
 import sun.rmi.runtime.Log;
 
+import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,6 +18,10 @@ public class LogHandler {
     private static String Log = "";
 
     private static boolean debugMode = false;
+
+    private static StringWriter sw = new StringWriter();
+    private static PrintWriter pw = new PrintWriter(sw);
+
 
     public static String getLog() {
         return Log;
@@ -30,49 +37,81 @@ public class LogHandler {
 
     public static void handleError(GeoDoorExceptions ex) {
         if (debugMode) {
-            LogHandler.printLog(new Date() + ": got Exception:");
-            ex.printStackTrace();
+            LogHandler.printLog(new Date() + ": got GeoDoorExceptions:");
+            ex.printStackTrace(pw);
+            String exceptionAsString = sw.toString();
+            LogHandler.printLog(exceptionAsString);
         }
     }
 
     public static void handleError(InterruptedException ex) {
         if (debugMode) {
-            LogHandler.printLog(new Date() + ": got Exception:");
-            ex.printStackTrace();
+            LogHandler.printLog(new Date() + ": got InterruptedException:");
+            ex.printStackTrace(pw);
+            String exceptionAsString = sw.toString();
+            LogHandler.printLog(exceptionAsString);
         }
     }
 
     public static void handleError(IOException ex) {
         if (debugMode) {
-            //LogHandler.printLog(new Date() + ": got Exception:");
-            //ex.printStackTrace();
+//            LogHandler.printLog(new Date() + ": got IOException:");
+//            ex.printStackTrace(pw);
+//            String exceptionAsString = sw.toString();
+//            LogHandler.printLog(exceptionAsString);
         }
     }
 
     public static void handleError(ClassNotFoundException ex) {
         if (debugMode) {
-            LogHandler.printLog(new Date() + ": got Exception:");
-            ex.printStackTrace();
+            LogHandler.printLog(new Date() + ": got ClassNotFoundException:");
+            ex.printStackTrace(pw);
+            String exceptionAsString = sw.toString();
+            LogHandler.printLog(exceptionAsString);
         }
     }
 
     public static void handleError(SQLException ex) {
         if (debugMode) {
-            LogHandler.printLog(new Date() + ": got Exception:");
-            ex.printStackTrace();
+            LogHandler.printLog(new Date() + ": got SQLException:");
+            ex.printStackTrace(pw);
+            String exceptionAsString = sw.toString();
+            LogHandler.printLog(exceptionAsString);
         }
     }
 
-    public static void handleError(Exception ex) {
+    public static void handleError(StringIndexOutOfBoundsException ex) {
         if (debugMode) {
-            LogHandler.printLog(new Date() + ": got Exception:");
-            ex.printStackTrace();
+            LogHandler.printLog(new Date() + ": got StringIndexOutOfBoundsException:");
+            ex.printStackTrace(pw);
+            String exceptionAsString = sw.toString();
+            LogHandler.printLog(exceptionAsString);
+        }
+    }
+
+    public static void handleError(XMLStreamException ex) {
+        if (debugMode) {
+            LogHandler.printLog(new Date() + ": got XMLStreamException:");
+            ex.printStackTrace(pw);
+            String exceptionAsString = sw.toString();
+            LogHandler.printLog(exceptionAsString);
         }
     }
 
     public static void printPrompt() {
-        LogHandler.printLog("");
         System.out.print("GeoDoorServer:> ");
+    }
+
+    public static void printCommand(String message) {
+        if (ArrayLog.size() > 200) {
+            ArrayLog.remove(0);
+            ArrayLog.add("GeoDoorServer:> " + message);
+        }
+        else {
+            ArrayLog.add("GeoDoorServer:> " + message);
+        }
+
+        updateString();
     }
 
     private static void updateString() {

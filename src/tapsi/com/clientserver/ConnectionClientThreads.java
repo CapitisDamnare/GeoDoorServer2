@@ -96,7 +96,6 @@ public class ConnectionClientThreads implements Runnable {
                 outputStream.close();
             }
             LogHandler.printLog(new Date() + ": ClientThread stopped from server -> " + clientID);
-            LogHandler.printPrompt();
             socket.close();
         } catch (IOException ex) {
             LogHandler.handleError(ex);

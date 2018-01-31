@@ -96,7 +96,6 @@ public class VisuClientThread implements Runnable {
                 objectOutputStream.close();
             }
             LogHandler.printLog(new Date() + ": VisuClientThread stopped from server -> " + clientID);
-            LogHandler.printPrompt();
             socket.close();
         } catch (IOException ex) {
             LogHandler.handleError(ex);

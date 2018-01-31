@@ -44,11 +44,12 @@ public class GeoDoorServer2 {
         //inVisu = new InterfaceToVisu();
 
         // Console Prompt
+        LogHandler.printPrompt();
         while (!quit) {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-            LogHandler.printPrompt();
             try {
                 String command = bufferedReader.readLine();
+                LogHandler.printCommand(command);
                 checkCommand(command);
             } catch (GeoDoorExceptions ex) {
                 LogHandler.handleError(ex);

@@ -199,7 +199,7 @@ public class VisuServerThread implements Runnable {
 
     // send a message to e specific client
     private void sendMessageToDevice(String threadID, String msg) {
-        LogHandler.printLog(new Date() + ": Sending Visu Message '" + msg +"' to device -> " + threadID);
+        LogHandler.printLog(new Date() + ": Sending Visu Message to device -> " + threadID);
         if (visuClientMap.containsKey(threadID)) {
             VisuClientThread currentUser = visuClientMap.get(threadID);
             currentUser.sendMessage(msg);
