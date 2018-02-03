@@ -2,7 +2,6 @@ package tapsi.com.database;
 
 
 import tapsi.com.data.Client;
-import tapsi.com.logging.GeoDoorExceptions;
 import tapsi.com.logging.LogHandler;
 
 import java.sql.*;
@@ -111,13 +110,11 @@ public class DBHandler {
             if (result == 1)
                 return true;
             else if (result != 0) {
-                throw new GeoDoorExceptions("Invalid Database! row:[phoneID]");
+                LogHandler.handleError("Invalid Database! row:[phoneID]");
             }
 
         } catch (SQLException e) {
             LogHandler.handleError(e);
-        } catch (GeoDoorExceptions geoDoorExceptions) {
-            LogHandler.handleError(geoDoorExceptions);
         }
         return false;
     }
@@ -133,13 +130,11 @@ public class DBHandler {
             if (result == 1)
                 return true;
             else if (result != 0) {
-                throw new GeoDoorExceptions("Invalid Database! row:[name]");
+                LogHandler.handleError("Invalid Database! row:[name]");
             }
 
         } catch (SQLException e) {
             LogHandler.handleError(e);
-        } catch (GeoDoorExceptions geoDoorExceptions) {
-            LogHandler.handleError(geoDoorExceptions);
         }
         return false;
     }
@@ -155,13 +150,11 @@ public class DBHandler {
             if (result == 1)
                 return true;
             else if (result != 0) {
-                throw new GeoDoorExceptions("Invalid Database row:[allowed]!");
+                LogHandler.handleError("Invalid Database row:[allowed]!");
             }
 
         } catch (SQLException e) {
             LogHandler.handleError(e);
-        } catch (GeoDoorExceptions geoDoorExceptions) {
-            LogHandler.handleError(geoDoorExceptions);
         }
         return false;
     }

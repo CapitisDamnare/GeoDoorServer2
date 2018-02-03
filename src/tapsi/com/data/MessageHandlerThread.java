@@ -2,7 +2,6 @@ package tapsi.com.data;
 
 import tapsi.com.database.DBHandler;
 import tapsi.com.knx.KNXHandler;
-import tapsi.com.logging.GeoDoorExceptions;
 import tapsi.com.logging.LogHandler;
 import tapsi.com.visuserver.VisuServerThread;
 
@@ -100,16 +99,14 @@ public class MessageHandlerThread implements Runnable {
                                 //LogHandler.printLog(new Date() + ": Took message: " + original);
                                 break;
                             default:
-                                throw new GeoDoorExceptions("Sent socket command doesn't exist: " + original);
+                                LogHandler.handleError("Sent socket command doesn't exist: " + original);
                         }
                     } else
-                        throw new GeoDoorExceptions("No identifier found!");
+                        LogHandler.handleError("No identifier found!");
                 } catch (StringIndexOutOfBoundsException e) {
                     LogHandler.handleError(e);
                 } catch (InterruptedException e) {
                     LogHandler.handleError(e);
-                } catch (GeoDoorExceptions geoDoorExceptions) {
-                    LogHandler.handleError(geoDoorExceptions);
                 }
             }
             try {
@@ -170,11 +167,7 @@ public class MessageHandlerThread implements Runnable {
                         listener.onClientAnswer(oldThreadID, threadID, "Gate1 status");
                         break;
                     default:
-                        try {
-                            throw new GeoDoorExceptions("Output command doesn't exist");
-                        } catch (GeoDoorExceptions geoDoorExceptions) {
-                            LogHandler.handleError(geoDoorExceptions);
-                        }
+                        LogHandler.handleError("Output command doesn't exist");
                 }
             }
     }

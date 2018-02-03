@@ -5,7 +5,6 @@ import tapsi.com.data.MessageHandlerThread;
 import tapsi.com.data.XMLReader;
 import tapsi.com.data.XMLWriter;
 import tapsi.com.database.DBHandler;
-import tapsi.com.logging.GeoDoorExceptions;
 import tapsi.com.logging.LogHandler;
 
 import java.io.IOException;
@@ -25,7 +24,7 @@ public class VisuServerThread implements Runnable {
     private static final int PORT = 5678;
 
     // Temp Variable ... i know bad design i guess
-    Map<String,List<String>> tempClient;
+    Map<String, List<String>> tempClient;
 
     // Message Handler for incoming messages
     private MessageHandlerThread msgHandler = null;
@@ -60,7 +59,7 @@ public class VisuServerThread implements Runnable {
         new XMLWriter(dbHandler);
         List<Client> clients = dbHandler.readAllObjects();
         if (clients != null) {
-            VisuSocketObject visuSocketObject = new VisuSocketObject(clients,"whatever");
+            VisuSocketObject visuSocketObject = new VisuSocketObject(clients, "whatever");
         } else {
             VisuSocketObject visuSocketObject = new VisuSocketObject("no Clients");
         }
@@ -113,7 +112,7 @@ public class VisuServerThread implements Runnable {
                 messageTemp = messageTemp.replace(command + "!", "");
 
                 String value = messageTemp;
-                msgHandler.putMessage( PORT + "#" + clientID + "#" + command + "#" + value);
+                msgHandler.putMessage(PORT + "#" + clientID + "#" + command + "#" + value);
             }
         });
     }
@@ -180,7 +179,7 @@ public class VisuServerThread implements Runnable {
         String socketOutput;
         List<Client> clients = dbHandler.readAllObjects();
         if (clients != null) {
-            VisuSocketObject visuSocketObject = new VisuSocketObject(clients,msg);
+            VisuSocketObject visuSocketObject = new VisuSocketObject(clients, msg);
             socketOutput = visuSocketObject.getContainer();
         } else {
             VisuSocketObject visuSocketObject = new VisuSocketObject("no Clients");
@@ -204,11 +203,7 @@ public class VisuServerThread implements Runnable {
             VisuClientThread currentUser = visuClientMap.get(threadID);
             currentUser.sendMessage(msg);
         } else {
-            try {
-                throw new GeoDoorExceptions("null - key doesn't exist anymore");
-            } catch (GeoDoorExceptions geoDoorExceptions) {
-                geoDoorExceptions.printStackTrace();
-            }
+            LogHandler.handleError("null - key doesn't exist anymore");
         }
     }
 
@@ -219,11 +214,7 @@ public class VisuServerThread implements Runnable {
             VisuClientThread currentUser = visuClientMap.get(threadID);
             currentUser.sendObject(msg);
         } else {
-            try {
-                throw new GeoDoorExceptions("null - key doesn't exist anymore");
-            } catch (GeoDoorExceptions geoDoorExceptions) {
-                geoDoorExceptions.printStackTrace();
-            }
+            LogHandler.handleError("null - key doesn't exist anymore");
         }
     }
 

@@ -3,7 +3,6 @@ package tapsi.com.clientserver;
 import tapsi.com.data.MessageHandlerThread;
 import tapsi.com.database.DBHandler;
 import tapsi.com.knx.KNXHandler;
-import tapsi.com.logging.GeoDoorExceptions;
 import tapsi.com.logging.LogHandler;
 import tapsi.com.visuserver.VisuServerThread;
 
@@ -168,12 +167,10 @@ public final class ServerThread implements Runnable {
                     if (value == 4) {
                         gateStatus = "answer:door1 open";
                         mapClient.sendMessage("answer:door1 open");
-                    }
-                    else if (value == 0) {
+                    } else if (value == 0) {
                         gateStatus = "answer:door1 closed";
                         mapClient.sendMessage("answer:door1 closed");
-                    }
-                    else if (value == 2) {
+                    } else if (value == 2) {
                         gateStatus = "answer:door1 stopped";
                         mapClient.sendMessage("answer:door1 stopped");
                     }
@@ -250,11 +247,7 @@ public final class ServerThread implements Runnable {
             ConnectionClientThreads currentUser = clientMap.get(threadID);
             currentUser.sendMessage(msg);
         } else {
-            try {
-                throw new GeoDoorExceptions("null - key doesn't exist anymore");
-            } catch (GeoDoorExceptions geoDoorExceptions) {
-                geoDoorExceptions.printStackTrace();
-            }
+            LogHandler.handleError("null - key doesn't exist anymore");
         }
     }
 

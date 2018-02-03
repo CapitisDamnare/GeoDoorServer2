@@ -1,7 +1,5 @@
 package tapsi.com.logging;
 
-import sun.rmi.runtime.Log;
-
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -35,18 +33,16 @@ public class LogHandler {
         LogHandler.debugMode = debugMode;
     }
 
-    public static void handleError(GeoDoorExceptions ex) {
+    public static void handleError(String ex) {
         if (debugMode) {
-            LogHandler.printLog(new Date() + ": got GeoDoorExceptions:");
-            ex.printStackTrace(pw);
-            String exceptionAsString = sw.toString();
-            LogHandler.printLog(exceptionAsString);
+            LogHandler.printLog(new Date() + ": Exception! --> GeoDoorExceptions:");
+            LogHandler.printLog(ex);
         }
     }
 
     public static void handleError(InterruptedException ex) {
         if (debugMode) {
-            LogHandler.printLog(new Date() + ": got InterruptedException:");
+            LogHandler.printLog(new Date() + ": Exception! --> InterruptedException:");
             ex.printStackTrace(pw);
             String exceptionAsString = sw.toString();
             LogHandler.printLog(exceptionAsString);
@@ -55,7 +51,7 @@ public class LogHandler {
 
     public static void handleError(IOException ex) {
         if (debugMode) {
-//            LogHandler.printLog(new Date() + ": got IOException:");
+//            LogHandler.printLog(new Date() + ": Exception! --> IOException:");
 //            ex.printStackTrace(pw);
 //            String exceptionAsString = sw.toString();
 //            LogHandler.printLog(exceptionAsString);
@@ -64,7 +60,7 @@ public class LogHandler {
 
     public static void handleError(ClassNotFoundException ex) {
         if (debugMode) {
-            LogHandler.printLog(new Date() + ": got ClassNotFoundException:");
+            LogHandler.printLog(new Date() + ": Exception! --> ClassNotFoundException:");
             ex.printStackTrace(pw);
             String exceptionAsString = sw.toString();
             LogHandler.printLog(exceptionAsString);
@@ -73,7 +69,7 @@ public class LogHandler {
 
     public static void handleError(SQLException ex) {
         if (debugMode) {
-            LogHandler.printLog(new Date() + ": got SQLException:");
+            LogHandler.printLog(new Date() + ": Exception! --> SQLException:");
             ex.printStackTrace(pw);
             String exceptionAsString = sw.toString();
             LogHandler.printLog(exceptionAsString);
@@ -82,7 +78,7 @@ public class LogHandler {
 
     public static void handleError(StringIndexOutOfBoundsException ex) {
         if (debugMode) {
-            LogHandler.printLog(new Date() + ": got StringIndexOutOfBoundsException:");
+            LogHandler.printLog(new Date() + ": Exception! --> StringIndexOutOfBoundsException:");
             ex.printStackTrace(pw);
             String exceptionAsString = sw.toString();
             LogHandler.printLog(exceptionAsString);
@@ -91,7 +87,7 @@ public class LogHandler {
 
     public static void handleError(XMLStreamException ex) {
         if (debugMode) {
-            LogHandler.printLog(new Date() + ": got XMLStreamException:");
+            LogHandler.printLog(new Date() + ": Exception! --> XMLStreamException:");
             ex.printStackTrace(pw);
             String exceptionAsString = sw.toString();
             LogHandler.printLog(exceptionAsString);

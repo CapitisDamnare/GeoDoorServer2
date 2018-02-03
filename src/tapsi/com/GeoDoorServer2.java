@@ -1,7 +1,6 @@
 package tapsi.com;
 
 import tapsi.com.clientserver.ServerThread;
-import tapsi.com.logging.GeoDoorExceptions;
 import tapsi.com.logging.LogHandler;
 import tapsi.com.visualization.InterfaceToVisu;
 import tapsi.com.visualization.Visualization;
@@ -51,9 +50,9 @@ public class GeoDoorServer2 {
                 String command = bufferedReader.readLine();
                 LogHandler.printCommand(command);
                 checkCommand(command);
-            } catch (GeoDoorExceptions ex) {
-                LogHandler.handleError(ex);
             } catch (IOException e) {
+                LogHandler.handleError(e);
+            } catch (InterruptedException e) {
                 LogHandler.handleError(e);
             }
         }
@@ -65,9 +64,8 @@ public class GeoDoorServer2 {
      * Checks the command provided in the command line and calls the corresponding method
      *
      * @param command
-     * @throws GeoDoorExceptions
      */
-    private static void checkCommand(String command) throws GeoDoorExceptions {
+    private static void checkCommand(String command) throws InterruptedException {
         switch (command) {
             case "quit":
                 setQuit(true);
@@ -135,7 +133,7 @@ public class GeoDoorServer2 {
                 serverThread.getKNXItem();
                 break;
             default:
-                throw new GeoDoorExceptions("Command not found");
+                LogHandler.handleError("Command not found");
         }
     }
 
@@ -145,7 +143,7 @@ public class GeoDoorServer2 {
      *
      * @param visu
      */
-    static void initVisuListener (Visualization visu) {
+    static void initVisuListener(Visualization visu) {
         visu.setCustomListener(new Visualization.VisListener() {
             @Override
             public void onStart() {
@@ -168,14 +166,12 @@ public class GeoDoorServer2 {
 
     /**
      * Command to stop the server. Ends the server thread.
-     *
-     * @throws GeoDoorExceptions
      */
-    public static void stopServer() throws GeoDoorExceptions {
+    public static void stopServer() {
         if (serverThread != null)
             serverThread.quit();
         else
-            throw new GeoDoorExceptions("Can't stop not started server!");
+            LogHandler.handleError("Can't stop not started server!");
     }
 
     /**
@@ -184,22 +180,17 @@ public class GeoDoorServer2 {
      * @param val
      */
     private static void setQuit(boolean val) {
-        try {
-            //visu.closeVisualization();
-            //inVisu.closeVisualisation();
-            stopServer();
-        } catch (GeoDoorExceptions ex) {
-            LogHandler.handleError(ex);
-        }
+        //visu.closeVisualization();
+        //inVisu.closeVisualisation();
+        stopServer();
         quit = val;
     }
 
     /**
+     * @param val
      * @Version Windows
      * Not usable in a raspberry PI3 application.
      * Hides the JavaFX visualization.
-     *
-     * @param val
      */
     private static void showHideVisu(boolean val) {
         inVisu.showVisualization(val);
