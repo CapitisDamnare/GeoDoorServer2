@@ -166,12 +166,12 @@ public class VisuServerThread implements Runnable {
 
     public void sendVisuMessageToDevice(String oldThreadID, String threadID, String msg) {
         // old ThreadID ist still active - close and delete it
-        if (visuClientMap.containsKey(oldThreadID)) {
-            VisuClientThread mapClient = visuClientMap.get(oldThreadID);
-            mapClient.closeThread();
-            visuClientMap.remove(oldThreadID);
-            LogHandler.printLog(new Date() + ": Closed old active visu connection: " + oldThreadID);
-        } else
+//        if (visuClientMap.containsKey(oldThreadID)) {
+//            VisuClientThread mapClient = visuClientMap.get(oldThreadID);
+//            mapClient.closeThread();
+//            visuClientMap.remove(oldThreadID);
+//            LogHandler.printLog(new Date() + ": Closed old active visu connection: " + oldThreadID);
+//        } else
             sendMessageToDevice(threadID, msg);
     }
 
@@ -187,12 +187,12 @@ public class VisuServerThread implements Runnable {
         }
 
         // old ThreadID ist still active - close and delete it
-        if (visuClientMap.containsKey(oldThreadID)) {
-            VisuClientThread mapClient = visuClientMap.get(oldThreadID);
-            mapClient.closeThread();
-            visuClientMap.remove(oldThreadID);
-            LogHandler.printLog(new Date() + ": Closed old active visu connection: " + oldThreadID);
-        } else
+//        if (visuClientMap.containsKey(oldThreadID)) {
+//            VisuClientThread mapClient = visuClientMap.get(oldThreadID);
+//            mapClient.closeThread();
+//            visuClientMap.remove(oldThreadID);
+//            LogHandler.printLog(new Date() + ": Closed old active visu connection: " + oldThreadID);
+//        } else
             sendObjectToDevice(threadID, socketOutput);
     }
 
@@ -243,12 +243,12 @@ public class VisuServerThread implements Runnable {
         }
 
         // old ThreadID ist still active - close and delete it
-        if (visuClientMap.containsKey(oldThreadID)) {
-            VisuClientThread mapClient = visuClientMap.get(oldThreadID);
-            mapClient.closeThread();
-            visuClientMap.remove(oldThreadID);
-            LogHandler.printLog(new Date() + ": Closed old active visu connection: " + oldThreadID);
-        } else
+//        if (visuClientMap.containsKey(oldThreadID)) {
+//            VisuClientThread mapClient = visuClientMap.get(oldThreadID);
+//            mapClient.closeThread();
+//            visuClientMap.remove(oldThreadID);
+//            LogHandler.printLog(new Date() + ": Closed old active visu connection: " + oldThreadID);
+//        } else
             sendMessageToDevice(threadID, "answer:ok");
 
     }
