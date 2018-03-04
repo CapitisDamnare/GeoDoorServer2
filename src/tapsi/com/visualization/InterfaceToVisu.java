@@ -13,13 +13,7 @@ public class InterfaceToVisu {
     }
 
     public void startPressed() {
-        try {
-            GeoDoorServer2.startServer();
-        } catch (InterruptedException ex) {
-            LogHandler.handleError(ex);
-        } catch (IOException ex) {
-            LogHandler.handleError(ex);
-        }
+        GeoDoorServer2.startServer();
     }
 
     public void stopPressed() {

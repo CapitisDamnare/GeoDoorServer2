@@ -1,5 +1,7 @@
 package tapsi.com.data;
 
+import tapsi.com.GeoDoorServer2;
+import tapsi.com.clientserver.ServerThread;
 import tapsi.com.database.DBHandler;
 import tapsi.com.knx.KNXHandler;
 import tapsi.com.logging.LogHandler;
@@ -114,12 +116,11 @@ public class MessageHandlerThread implements Runnable {
             } catch (InterruptedException e) {
 
                 LogHandler.handleError(e);
-                run();
             }
         }
     }
 
-    // TODO: Uncomment for Release Version
+    // TODO: Check getStatus command
     private void commandOutput(String threadID, String message, String port) {
         String messageTemp = message;
         String msg = messageTemp.substring(0, messageTemp.indexOf("-"));
@@ -255,6 +256,9 @@ public class MessageHandlerThread implements Runnable {
                             break;
                         case "log":
                             listener.onSendLog(oldThreadID, threadID, "answer:log!" + LogHandler.getLog());
+                            break;
+                        case "restart":
+                            GeoDoorServer2.restart();
                             break;
                     }
                 }

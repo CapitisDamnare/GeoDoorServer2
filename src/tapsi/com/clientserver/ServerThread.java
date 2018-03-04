@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 public final class ServerThread implements Runnable {
 
-    private static final int PORT = 1234;
+    private static int PORT = 1234;
 
     // Gate Status
     private String gateStatus = "answer:door1 closed";
@@ -79,6 +79,10 @@ public final class ServerThread implements Runnable {
 
     public static int getPORT() {
         return PORT;
+    }
+
+    public static void setPORT(int PORT) {
+        ServerThread.PORT = PORT;
     }
 
     // If a new client connects to the socket a new Thread will be started for the connection
@@ -217,7 +221,7 @@ public final class ServerThread implements Runnable {
             msgHandler.quit();
             dbHandler.closeDB();
             knxHandler.stopTimer();
-            visuServerThread.closeVisuClientThreads();
+            visuServerThread.quit();
             //stopPingTimer();
         } catch (IOException ex) {
             LogHandler.handleError(ex);

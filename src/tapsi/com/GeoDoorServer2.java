@@ -56,9 +56,11 @@ public class GeoDoorServer2 {
                 LogHandler.handleError(e);
             }
         }
+        LogHandler.printLog(new Date() + ": Prompt closed");
     }
 
     // Todo: add console command: set permission
+    // Todo: add setPort Command
 
     /**
      * Checks the command provided in the command line and calls the corresponding method
@@ -70,6 +72,9 @@ public class GeoDoorServer2 {
             case "quit":
                 setQuit(true);
                 break;
+            case "restart":
+                restart();
+                break;
             case "show":
                 //showHideVisu(true);
                 visu.hideVisualization(false);
@@ -79,13 +84,7 @@ public class GeoDoorServer2 {
                 visu.hideVisualization(true);
                 break;
             case "start": {
-                try {
-                    startServer();
-                } catch (InterruptedException ex) {
-                    LogHandler.handleError(ex);
-                } catch (IOException ex) {
-                    LogHandler.handleError(ex);
-                }
+                startServer();
                 break;
             }
             case "debug on":
@@ -155,13 +154,15 @@ public class GeoDoorServer2 {
     /**
      * Command to start the server. Starts the server thread.
      *
-     * @throws InterruptedException
-     * @throws IOException
      */
-    public static void startServer() throws InterruptedException, IOException {
-        serverThread = new ServerThread();
-        Thread tServerThread = new Thread(serverThread);
-        tServerThread.start();
+    public static void startServer() {
+        try {
+            serverThread = new ServerThread();
+            Thread tServerThread = new Thread(serverThread);
+            tServerThread.start();
+        } catch (IOException ex) {
+            LogHandler.handleError(ex);
+        }
     }
 
     /**
@@ -184,6 +185,11 @@ public class GeoDoorServer2 {
         //inVisu.closeVisualisation();
         stopServer();
         quit = val;
+    }
+
+    public static void restart() {
+        stopServer();
+        startServer();
     }
 
     /**
