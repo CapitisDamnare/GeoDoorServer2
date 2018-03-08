@@ -105,7 +105,6 @@ public class VisuClientThread implements Runnable {
     public void sendMessage(String text) {
         try {
             objectOutputStream.writeObject(text);
-            LogHandler.printLog(new Date() + ": sendMessage done!");
         } catch (IOException ex) {
             LogHandler.handleError(ex);
         }
@@ -114,7 +113,6 @@ public class VisuClientThread implements Runnable {
     public void sendObject(String msg) {
         try {
             objectOutputStream.writeObject(msg);
-            LogHandler.printLog(new Date() + ": sendObject done!");
         } catch (IOException ex) {
             LogHandler.handleError(ex);
         }
