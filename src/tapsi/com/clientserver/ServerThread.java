@@ -85,6 +85,10 @@ public final class ServerThread implements Runnable {
         ServerThread.PORT = PORT;
     }
 
+    public static void setVisuPort(int PORT) {
+        VisuServerThread.setPORT(PORT);
+    }
+
     // If a new client connects to the socket a new Thread will be started for the connection
     @Override
     public void run() {

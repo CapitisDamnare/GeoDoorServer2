@@ -247,6 +247,12 @@ public class MessageHandlerThread implements Runnable {
 
         String oldThreadID = dbHandler.selectThreadIDByName(name);
 
+        String arg = "";
+        if (command.contains("@")) {
+            arg = command.substring(command.indexOf("@")+1, command.length());
+            command = command.replace("@" + arg, "");
+        }
+
         if (phoneId.equals("13579") && port.equals(Integer.toString(VisuServerThread.getPORT()))) {
             if (checkPhoneID) {
                 if (checkAllowed) {
@@ -258,6 +264,14 @@ public class MessageHandlerThread implements Runnable {
                             listener.onSendLog(oldThreadID, threadID, "answer:log!" + LogHandler.getLog());
                             break;
                         case "restart":
+                            GeoDoorServer2.restart();
+                            break;
+                        case "serverPort":
+                            ServerThread.setPORT(Integer.parseInt(arg));
+                            GeoDoorServer2.restart();
+                            break;
+                        case "visuPort":
+                            ServerThread.setVisuPort(Integer.parseInt(arg));
                             GeoDoorServer2.restart();
                             break;
                     }

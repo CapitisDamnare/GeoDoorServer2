@@ -1,5 +1,6 @@
 package tapsi.com;
 
+import javafx.application.Application;
 import tapsi.com.clientserver.ServerThread;
 import tapsi.com.logging.LogHandler;
 import tapsi.com.visualization.InterfaceToVisu;
@@ -29,18 +30,13 @@ public class GeoDoorServer2 {
 
         LogHandler.setDebugMode(true);
 
-//        new Thread() {
-//            @Override
-//            public void run() {
-//                javafx.application.Application.launch(Visualization.class);
-//            }
-//        }.start();
+//        new Thread(() -> Application.launch(Visualization.class)).start();
 //        visu = Visualization.waitForStartUpTest();
 //        initVisuListener(visu);
 //        visu.printSomething();
-
-        // Create instance of the server
-        //inVisu = new InterfaceToVisu();
+//
+//        // Create instance of the server
+//        inVisu = new InterfaceToVisu();
 
         // Console Prompt
         LogHandler.printPrompt();
@@ -68,25 +64,41 @@ public class GeoDoorServer2 {
      * @param command
      */
     private static void checkCommand(String command) throws InterruptedException {
-        switch (command) {
+        String com = command;
+        String arg = "";
+        if (command.contains(":")) {
+            String temp = com;
+            com = temp.substring(0, temp.indexOf(":"));
+            temp = temp.replace(com + ":", "");
+            arg = temp;
+        }
+
+        switch (com) {
             case "quit":
                 setQuit(true);
+                break;
+            case "start":
+                startServer();
                 break;
             case "restart":
                 restart();
                 break;
+            case "setServerPort":
+                ServerThread.setPORT(Integer.parseInt(arg));
+                restart();
+                break;
+            case "setVisuPort":
+                ServerThread.setVisuPort(Integer.parseInt(arg));
+                restart();
+                break;
             case "show":
-                //showHideVisu(true);
+                showHideVisu(false);
                 visu.hideVisualization(false);
                 break;
             case "hide":
-                //showHideVisu(false);
+                showHideVisu(true);
                 visu.hideVisualization(true);
                 break;
-            case "start": {
-                startServer();
-                break;
-            }
             case "debug on":
                 LogHandler.setDebugMode(true);
                 break;
@@ -108,28 +120,19 @@ public class GeoDoorServer2 {
             case "message queue":
                 LogHandler.printLog(new Date() + ": Message queue Size: " + serverThread.getMessageQueueSize());
                 break;
-            case "connected users":
-                LogHandler.printLog(new Date() + ": Connected users:\n");
-                serverThread.getUsers();
-                break;
             case "help":
                 LogHandler.printLog("quit                - disables the server and ends the program");
-                LogHandler.printLog("show                - show visualisation");
-                LogHandler.printLog("hide                - hide visualisation");
                 LogHandler.printLog("start               - starts the server");
+                LogHandler.printLog("restart             - restarts the server");
+                LogHandler.printLog("setServerPort:xxxx  - sets the server PORT where xxxx is the PORT. Restarts automatically!");
+                LogHandler.printLog("setVisuPort:xxxx    - sets the Visu PORT where xxxx is the PORT. Restarts automatically!");
+                LogHandler.printLog("show                - show visualisation (not available on a raspberry PI)");
+                LogHandler.printLog("hide                - hide visualisation (not available on a raspberry PI)");
                 LogHandler.printLog("debug on            - enables error debug messages");
                 LogHandler.printLog("debug off           - disable error debug messages");
-                LogHandler.printLog("knx on              - enables knx thread (door status)");
-                LogHandler.printLog("knx off             - disable knx thread (door status)");
                 LogHandler.printLog("set door open       - set door to open state");
                 LogHandler.printLog("set door closed     - set door to closed state");
                 LogHandler.printLog("message queue       - gets the current message queue size");
-                LogHandler.printLog("connected users     - shows a list of the current connected users");
-                break;
-
-            // Test commands delete later
-            case "knx get":
-                serverThread.getKNXItem();
                 break;
             default:
                 LogHandler.handleError("Command not found");
@@ -199,6 +202,6 @@ public class GeoDoorServer2 {
      * Hides the JavaFX visualization.
      */
     private static void showHideVisu(boolean val) {
-        inVisu.showVisualization(val);
+        inVisu.hideVisualization(val);
     }
 }

@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 public class VisuServerThread implements Runnable {
 
-    private static final int PORT = 5678;
+    private static int PORT = 5678;
 
     // Temp Variable ... i know bad design i guess
     Map<String, List<String>> tempClient;
@@ -74,6 +74,10 @@ public class VisuServerThread implements Runnable {
 
     public static int getPORT() {
         return PORT;
+    }
+
+    public static void setPORT(int PORT) {
+        VisuServerThread.PORT = PORT;
     }
 
     // If a new client connects to the socket a new Thread will be started for the connection
