@@ -2,7 +2,7 @@
 
 **Dieses Java Programm sollte in Kombination mit der GeoDoor Android App benutzt werden.**
 
-**Link: https://github.com/CapitisDamnare/GeoDoor_V2_0**
+**Link: https://github.com/JustForFunDeveloper/GeoDoor_V2_0**
 
 ## Vision
 Ein Serverprogramm läuft auf einem Raspberry PI welcher mit dem Internent verbunden ist.
