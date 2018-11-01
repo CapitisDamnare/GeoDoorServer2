@@ -23,5 +23,5 @@ Das Programm besitzt im Moment eine rudimentäre Konsole welche es erlaubt Nutze
 In Kürze wird es hier eine kompilierte Beta Version des Programms geben, welche einfach auf einem Raspbery PI gestartet werden kann.
 
 ## JavaDoc
-https://capitisdamnare.github.io/GeoDoorServer2/
+https://JustForFunDeveloper.github.io/GeoDoorServer2/
 
