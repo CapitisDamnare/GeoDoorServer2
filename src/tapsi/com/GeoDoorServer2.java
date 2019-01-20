@@ -28,6 +28,23 @@ public class GeoDoorServer2 {
      */
     public static void main(String[] args) {
 
+        if (args.length > 0) {
+            if (args[0].equals("-s")) {
+                startServer();
+                while (true) {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            else {
+                System.out.println(args[0] + " argument not supported!\nGeoDoor Server aborted!");
+                return;
+            }
+            }
+
         LogHandler.setDebugMode(true);
 
 //        new Thread(() -> Application.launch(Visualization.class)).start();
@@ -135,7 +152,7 @@ public class GeoDoorServer2 {
                 LogHandler.printLog("message queue       - gets the current message queue size");
                 break;
             default:
-                LogHandler.handleError("Command not found");
+                LogHandler.handleError("Command not found: \n" + com);
         }
     }
 
